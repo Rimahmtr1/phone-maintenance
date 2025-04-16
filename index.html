@@ -34,5 +34,34 @@
 </head>
 <body>
     Hello World welcome
+    <script>
+        var admin = require("firebase-admin");
+
+// Initialize the Admin SDK
+var serviceAccount = require("path/to/serviceAccountKey.json");
+
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount)
+});
+
+// Get a reference to Firestore
+const db = admin.firestore();
+
+// Function to get the number
+async function getNumber() {
+    const docRef = db.collection('ph').doc('ph1'); // Reference to the document
+    const doc = await docRef.get();
+    
+    if (doc.exists) {
+        const number = doc.data().number; // Access the 'number' field
+        console.log(`Number: ${number}`);
+    } else {
+        console.log("No such document!");
+    }
+}
+
+// Call the function
+getNumber().catch(console.error);
+    </script>
 </body>
 </html>
