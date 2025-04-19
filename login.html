@@ -22,13 +22,24 @@
         </nav>
     </header>
     <!--Main Part-->
-    <div class="main">
-        <div class="overlay">
-            <h1>Welcome to Our Website</h1>
-            <a href="login.html">Login</a>
-            <a href="signup.html">Sign Up</a>
+    <div class="login-wrapper">
+        <div class="login-container">
+            <h2>Login</h2>
+            <form>
+                <div class="input-group">
+                    <label for="email-phone">Email or Phone</label>
+                    <input type="text" id="email-phone" name="email-phone" required>
+                </div>
+                <div class="input-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" required>
+                </div>
+                <button type="submit" class="login-button">Login</button>
+            </form>
+            <div class="footer-text">Don't have an account? <a href="signup.html">Sign Up</a></div>
         </div>
     </div>
+    
 
     <!--Footer Part-->
     <footer class="footer">
