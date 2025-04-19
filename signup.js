@@ -1,124 +1,115 @@
-// Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
-import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/9.1.3/firebase-firestore.js";
-import firebase from "firebase/compat/app";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
+// Import Firebase functions (if you're using modules, otherwise ensure they're included in your HTML)
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 
 // Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-  apiKey: "AIzaSyCJsJsuMx1LT6SXZcCqdHa5wkueqXTTT4Q",
-  authDomain: "phone-maintenance-18b38.firebaseapp.com",
-  projectId: "phone-maintenance-18b38",
-  storageBucket: "phone-maintenance-18b38.firebasestorage.app",
-  messagingSenderId: "881648450762",
-  appId: "1:881648450762:web:b17fef83d6015c65a40833",
-  measurementId: "G-0MD0GJJ0E2"
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_PROJECT_ID.appspot.com",
+    messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+    appId: "YOUR_APP_ID"
 };
 
 // Initialize Firebase
-const app = firebase.initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
-const db = firebase.firestore();
-document.addEventListener('DOMContentLoaded', function() {
-    const form = document.getElementById('Signup');
-    const messageElement = document.getElementById('message');
-    const signupButton = document.querySelector('.signup-button'); // Select the button
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
 
-    // Event listener for the signup button
-    signupButton.addEventListener('click', function(event) {
-        event.preventDefault(); // Prevent form submission
-
-        // Get input values
-        const firstName = document.getElementById('first-name').value.trim();
-        const lastName = document.getElementById('last-name').value.trim();
-        const phone = document.getElementById('phone').value.trim();
-        const email = document.getElementById('email').value.trim();
-        const password = document.getElementById('password').value.trim();
-        const confirmPassword = document.getElementById('c-password').value.trim();
-        // Call the validation function
-        const validationResult = validateForm(firstName, lastName, phone, email, password, confirmPassword);
-
-        // Display the result
-        if (validationResult.success) {
-            messageElement.textContent = 'Signup successful!';
-            messageElement.style.color = 'green'; // Success message color
-            form.reset(); // Clear the form
-        } else {
-            messageElement.textContent = validationResult.message;
-            messageElement.style.color = 'red'; // Error message color
-        }
-    });
-
-    // Function to validate the form inputs
-    function validateForm(firstName, lastName, phone, email, password, confirmPassword) {
-        // Regular expressions for validation
-        const namePattern = /^[A-Za-z]+$/; // Only letters
-        const phonePattern = /^(03|76|78|81|70|71)[0-9]{6}$/; // Valid Lebanese phone number without country code
-        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // Basic email format
-
-        // Validation checks
-        if (!namePattern.test(firstName)) {
-            return { success: false, message: 'Please enter a valid first name.' };
-        }
-        if (!namePattern.test(lastName)) {
-            return { success: false, message: 'Please enter a valid last name.' };
-        }
-        if (!phonePattern.test(phone)) {
-            return { success: false, message: 'Please enter a valid phone number (8 digits starting with 03, 76, 78, 81, 70, or 71).' };
-        }
-        if (!emailPattern.test(email)) {
-            return { success: false, message: 'Please enter a valid email address.' };
-        }
-        if (password.length < 6) {
-            return { success: false, message: 'Password must be at least 6 characters long.' };
-        }
-        if (password !== confirmPassword) {
-            return { success: false, message: 'Passwords do not match.' };
-        }
-
-        // If all validations pass
-        return { success: true };
-    }
-
-    // Toggle password visibility using eye icons
+document.addEventListener('DOMContentLoaded', () => {
     const togglePassword = document.getElementById('togglePassword');
     const toggleConfirmPassword = document.getElementById('toggleConfirmPassword');
     const passwordInput = document.getElementById('password');
     const confirmPasswordInput = document.getElementById('c-password');
+    const signupForm = document.getElementById('Signup');
+    const messageDisplay = document.createElement('p');
+    signupForm.appendChild(messageDisplay); // Append message display to the form
 
-    togglePassword.addEventListener('click', function() {
-        // Toggle the type attribute for password field
-        const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-        passwordInput.setAttribute('type', type);
-        this.classList.toggle('fa-eye'); // Toggle eye icon
-        this.classList.toggle('fa-eye-slash'); // Toggle eye-slash icon
+    // Toggle password visibility
+    togglePassword.addEventListener('click', () => {
+        const type = passwordInput.type === 'password' ? 'text' : 'password';
+        passwordInput.type = type;
+        togglePassword.classList.toggle('fa-eye-slash');
     });
 
-    toggleConfirmPassword.addEventListener('click', function() {
-        // Toggle the type attribute for confirm password field
-        const type = confirmPasswordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-        confirmPasswordInput.setAttribute('type', type);
-        this.classList.toggle('fa-eye'); // Toggle eye icon
-        this.classList.toggle('fa-eye-slash'); // Toggle eye-slash icon
-    });
-});
-document.getElementById('submit').addEventListener('click', async () => {
-    const firstName = document.getElementById('first-name').value;
-    const clientId = "Client-1"; // Modify as needed
-
-    // Save the first name to Firestore
-    await db.collection('signup').doc(clientId).set({
-        Fname: firstName
+    toggleConfirmPassword.addEventListener('click', () => {
+        const type = confirmPasswordInput.type === 'password' ? 'text' : 'password';
+        confirmPasswordInput.type = type;
+        toggleConfirmPassword.classList.toggle('fa-eye-slash');
     });
 
-    // Retrieve and display the first name
-    const doc = await db.collection('signup').doc(clientId).get();
-    if (doc.exists) {
-        document.getElementById('display-name').innerText = `First Name: ${doc.data().Fname}`;
-    } else {
-        console.log("No such document!");
-    }
+    // Handle form submission
+    signupForm.addEventListener('submit', async (event) => {
+        event.preventDefault(); // Prevent default form submission
+
+        const firstName = document.getElementById('first-name').value.trim();
+        const lastName = document.getElementById('last-name').value.trim();
+        const phone = document.getElementById('phone').value.trim();
+        const email = document.getElementById('email').value.trim();
+        const password = passwordInput.value;
+        const confirmPassword = confirmPasswordInput.value;
+
+        // Clear previous messages
+        messageDisplay.textContent = '';
+
+        // Validation
+        const namePattern = /^[A-Za-z]{3,}$/; // At least 3 letters, only letters allowed
+
+        if (!namePattern.test(firstName)) {
+            messageDisplay.textContent = "First name must be at least 3 letters and contain only letters.";
+            messageDisplay.style.color = "red";
+            return;
+        }
+
+        if (!namePattern.test(lastName)) {
+            messageDisplay.textContent = "Last name must be at least 3 letters and contain only letters.";
+            messageDisplay.style.color = "red";
+            return;
+        }
+
+        // Validate phone number
+        const phonePattern = /^(76|70|71|81|03|79|78)\d{6}$/;
+        if (!phonePattern.test(phone)) {
+            messageDisplay.textContent = "Phone number must be 8 digits and start with 76, 70, 71, 81, 03, 79, or 78.";
+            messageDisplay.style.color = "red";
+            return;
+        }
+
+        // Validate email
+        if (!/\S+@\S+\.\S+/.test(email)) {
+            messageDisplay.textContent = "Please enter a valid email address.";
+            messageDisplay.style.color = "red";
+            return;
+        }
+
+        // Validate password length
+        if (password.length < 6) {
+            messageDisplay.textContent = "Password must be at least 6 characters long.";
+            messageDisplay.style.color = "red";
+            return;
+        }
+
+        // Check if passwords match
+        if (password !== confirmPassword) {
+            messageDisplay.textContent = "Passwords do not match!";
+            messageDisplay.style.color = "red";
+            return;
+        }
+
+        // Save first name to Firestore
+        try {
+            await setDoc(doc(db, "signup", "Client-1"), {
+                Fname: firstName
+            });
+            messageDisplay.textContent = `Welcome, ${firstName}! Your sign-up was successful.`;
+            messageDisplay.style.color = "green";
+        } catch (error) {
+            messageDisplay.textContent = "Error saving data. Please try again.";
+            messageDisplay.style.color = "red";
+            console.error("Error adding document: ", error);
+        }
+
+        // Reset form
+        signupForm.reset();
+    });
 });
