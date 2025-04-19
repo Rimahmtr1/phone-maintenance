@@ -1,5 +1,27 @@
-console.log('signup.js is loaded'); // Confirm the script is loaded
+// Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+import { getAnalytics } from "firebase/analytics";
+import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/9.1.3/firebase-firestore.js";
+import firebase from "firebase/compat/app";
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
 
+// Your web app's Firebase configuration
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
+  apiKey: "AIzaSyCJsJsuMx1LT6SXZcCqdHa5wkueqXTTT4Q",
+  authDomain: "phone-maintenance-18b38.firebaseapp.com",
+  projectId: "phone-maintenance-18b38",
+  storageBucket: "phone-maintenance-18b38.firebasestorage.app",
+  messagingSenderId: "881648450762",
+  appId: "1:881648450762:web:b17fef83d6015c65a40833",
+  measurementId: "G-0MD0GJJ0E2"
+};
+
+// Initialize Firebase
+const app = firebase.initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
+const db = firebase.firestore();
 document.addEventListener('DOMContentLoaded', function() {
     const form = document.getElementById('Signup');
     const messageElement = document.getElementById('message');
@@ -16,7 +38,6 @@ document.addEventListener('DOMContentLoaded', function() {
         const email = document.getElementById('email').value.trim();
         const password = document.getElementById('password').value.trim();
         const confirmPassword = document.getElementById('c-password').value.trim();
-
         // Call the validation function
         const validationResult = validateForm(firstName, lastName, phone, email, password, confirmPassword);
 
@@ -84,3 +105,14 @@ document.addEventListener('DOMContentLoaded', function() {
         this.classList.toggle('fa-eye-slash'); // Toggle eye-slash icon
     });
 });
+await db.collection('signup').doc(clientId).set({
+    Fname: firstName
+});
+
+// Retrieve and display the first name
+const doc = await db.collection('signup').doc(clientId).get();
+if (doc.exists) {
+    document.getElementById('display-name').innerText = `First Name: ${doc.data().Fname}`;
+} else {
+    console.log("No such document!");
+}
