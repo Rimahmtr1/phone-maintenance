@@ -102,14 +102,3 @@ document.addEventListener('DOMContentLoaded', function() {
         this.classList.toggle('fa-eye-slash'); // Toggle eye-slash icon
     });
 });
-// Function to set a value in Firestore
-window.setValue = async function() {
-    const docRef = doc(db, 'signup', 'Client-1'); // Reference to the document
-    const newValue = document.getElementById('first-name').value; // Get input value from the user
-    try {
-        await setDoc(docRef, { Fname: newValue }); // Set the 'number' field
-        document.getElementById('valueDisplay').innerText = `Value set to Firestore: ${newValue}`;
-    } catch (error) {
-        document.getElementById('valueDisplay').innerText = `Error setting document: ${error.message}`;
-    }
-};
