@@ -18,6 +18,7 @@
         const analytics = getAnalytics(app);
         const db = getFirestore(app);
 
+
 document.addEventListener('DOMContentLoaded', () => {
     const togglePassword = document.getElementById('togglePassword');
     const toggleConfirmPassword = document.getElementById('toggleConfirmPassword');
