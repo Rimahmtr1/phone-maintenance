@@ -105,14 +105,20 @@ document.addEventListener('DOMContentLoaded', function() {
         this.classList.toggle('fa-eye-slash'); // Toggle eye-slash icon
     });
 });
-await db.collection('signup').doc(clientId).set({
-    Fname: firstName
-});
+document.getElementById('submit').addEventListener('click', async () => {
+    const firstName = document.getElementById('first-name').value;
+    const clientId = "Client-1"; // Modify as needed
 
-// Retrieve and display the first name
-const doc = await db.collection('signup').doc(clientId).get();
-if (doc.exists) {
-    document.getElementById('display-name').innerText = `First Name: ${doc.data().Fname}`;
-} else {
-    console.log("No such document!");
-}
+    // Save the first name to Firestore
+    await db.collection('signup').doc(clientId).set({
+        Fname: firstName
+    });
+
+    // Retrieve and display the first name
+    const doc = await db.collection('signup').doc(clientId).get();
+    if (doc.exists) {
+        document.getElementById('display-name').innerText = `First Name: ${doc.data().Fname}`;
+    } else {
+        console.log("No such document!");
+    }
+});
