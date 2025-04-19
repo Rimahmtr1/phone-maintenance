@@ -1,13 +1,9 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
-import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/9.1.3/firebase-firestore.js";
-import firebase from "firebase/compat/app";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
+import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/9.1.3/firebase-firestore.js";
 
 // Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
   apiKey: "AIzaSyCJsJsuMx1LT6SXZcCqdHa5wkueqXTTT4Q",
   authDomain: "phone-maintenance-18b38.firebaseapp.com",
@@ -19,9 +15,10 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase
-const app = firebase.initializeApp(firebaseConfig);
+const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
-const db = firebase.firestore();
+const db = getFirestore(app);
+
 document.addEventListener('DOMContentLoaded', function() {
     const form = document.getElementById('Signup');
     const messageElement = document.getElementById('message');
@@ -105,20 +102,14 @@ document.addEventListener('DOMContentLoaded', function() {
         this.classList.toggle('fa-eye-slash'); // Toggle eye-slash icon
     });
 });
-document.getElementById('submit').addEventListener('click', async () => {
-    const firstName = document.getElementById('first-name').value;
-    const clientId = "Client-1"; // Modify as needed
-
-    // Save the first name to Firestore
-    await db.collection('signup').doc(clientId).set({
-        Fname: firstName
-    });
-
-    // Retrieve and display the first name
-    const doc = await db.collection('signup').doc(clientId).get();
-    if (doc.exists) {
-        document.getElementById('display-name').innerText = `First Name: ${doc.data().Fname}`;
-    } else {
-        console.log("No such document!");
+// Function to set a value in Firestore
+window.setValue = async function() {
+    const docRef = doc(db, 'signup', 'Client-1'); // Reference to the document
+    const newValue = document.getElementById('first-name').value; // Get input value from the user
+    try {
+        await setDoc(docRef, { Fname: newValue }); // Set the 'number' field
+        document.getElementById('valueDisplay').innerText = `Value set to Firestore: ${newValue}`;
+    } catch (error) {
+        document.getElementById('valueDisplay').innerText = `Error setting document: ${error.message}`;
     }
-});
+};
