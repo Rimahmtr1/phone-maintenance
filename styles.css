@@ -1,3 +1,424 @@
-body{
-    background: red;
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+}
+header {
+    background-color:#00093b;
+    color: #FFFFE0;
+    padding: 10px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.logo {
+    font-size: 24px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+}
+.logo img {
+    max-width: 100px; /* Adjust size as needed */
+    height: auto;
+    margin-right: 10px; /* Space between logo and text */
+}
+.logo h1 {
+    font-size: 24px; /* Adjust font size */
+    color:white; /* Text color */
+    margin: 0; /* Remove default margin */
+    font-family: 'Arial', sans-serif; /* Font family */
+}
+nav {
+    display: flex;
+}
+nav a {
+    color: white;
+    font-weight: bold;
+    text-decoration: none;
+    padding: 15px;
+}
+nav a:hover {
+    background-color: #50C878;
+}
+.menu-toggle {
+    display: none;
+    cursor: pointer;
+    padding: 10px;
+    background-color: #333; /* Button background */
+    color: white; /* Button text color */
+    text-align: center;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+}
+/*Main Style*/
+.main {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh; /* Full viewport height */
+    background-image: url('img/background2.avif'); /* Replace with your image */
+    background-size: cover; /* Cover the entire area */
+    background-position: center; /* Center the image */
+    position: relative; /* For absolute positioning of content */
+}
+
+.overlay {
+    position: absolute; /* Position content over the image */
+    background-color: rgba(39, 86, 137, 0.5); /* Semi-transparent background */
+    padding: 20px;
+    border-radius: 10px; /* Rounded corners */
+    text-align: center; /* Center text */
+}
+.overlay h1{
+    color: white;
+}
+.overlay a {
+    display: inline-block;
+    margin: 10px 0;
+    padding: 10px 20px;
+    background-color: #ff0000; /* Gold color */
+    color: rgb(255, 255, 255); /* Dark text color */
+    font-weight: bold;
+    text-decoration: none;
+    border-radius: 5px; /* Rounded corners for buttons */
+    transition: background-color 0.3s; /* Smooth transition */
+}
+
+.overlay a:hover {
+    background-color: #07ff1c; /* Lighter gold on hover */
+}
+/*Footer Part style*/   
+.footer {
+    background-color: #00093b; /* Dark background */
+    color: #ffffff; /* White text */
+    padding: 5px 0px;
+    text-align: left; /* Left align text for a professional look */
+}
+
+.footer-container {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap; /* Allow wrapping on smaller screens */
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.footer-section {
+    flex: 1;
+    min-width: 250px; /* Minimum width for sections */
+    margin: 20px;
+}
+
+.footer-section h2 {
+    margin-top: 0;
+    font-size: 18px; /* Slightly larger font for headings */
+}
+
+.footer-section p {
+    margin: 5px 0; /* Spacing for paragraphs */
+}
+
+.footer-section ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.footer-section a {
+    color: #61dafb; /* Light blue links */
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+.footer-section a:hover {
+    color: #21a1f1; /* Darker blue on hover */
+}
+
+.footer-bottom {
+    margin-top: 0px;
+    text-align:center; /* Center text in the bottom section */
+    border-top: 2px solid #000000; /* Light border */
+    padding-top: 0px;
+    background-color: #00093b;
+    color: white;
+}
+
+.socials {
+    list-style-type: none;
+    padding: 0;
+}
+
+.socials li {
+    display: inline;
+    margin: 0 10px;
+}
+
+.socials a {
+    color: #61dafb; /* Light blue */
+}
+
+.socials a:hover {
+    color: #21a1f1; /* Darker blue on hover */
+}
+/*About-us style page*/
+.container {
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 20px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+h1 {
+    margin: 0;
+    font-size: 2.5em;
+}
+h2 {
+    color: #007bff;
+    margin-top: 20px;
+}
+p {
+    line-height: 1.6;
+}
+.mission {
+    background: #e9ecef;
+    padding: 15px;
+    border-left: 5px solid #007bff;
+    margin: 20px 0;
+}
+.team {
+    margin-top: 30px;
+}
+.team-member {
+    display: flex;
+    align-items: center;
+    margin: 15px 0;
+}
+.team-member img {
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    margin-right: 15px;
+}
+/*Signup style*/
+.signup-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 150vh;
+    background: linear-gradient(to right, #f0f4f8, #e0e8ef);
+}
+.signup-container {
+    background: white;
+    padding: 40px;
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    width: 400px;
+    text-align: center;
+    transition: transform 0.3s;
+}
+.signup-container:hover {
+    transform: scale(1.02);
+}
+h2 {
+    margin-bottom: 20px;
+    color: #007bff;
+    font-size: 24px;
+    font-weight: 600;
+}
+.input-group {
+    margin-bottom: 15px;
+    text-align: left;
+    position: relative;
+}
+.input-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #555;
+}
+.name-fields {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px; /* Space between the two fields */
+}
+.name-fields input,
+.input-group input,
+.country-code {
+    width: 100%; /* Ensure all inputs are full width */
+    padding: 8px; /* Minimized padding */
+    border: 1px solid #ced4da;
+    border-radius: 5px;
+    transition: border-color 0.3s;
+    height: 40;
+    padding-right: 40px;
+}
+.phone-fields {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px; /* Space between the country code and phone number */
+}
+.input-group input:focus {
+    border-color: #007bff;
+    outline: none;
+}
+.input-group i {
+    position: absolute;
+    right: 10px;
+    top: 60%;
+    transform: translateY(-50%);
+    cursor: pointer;
+}
+.signup-button {
+    width: 100%;
+    padding: 10px; /* Reduced button padding */
+    background: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background 0.3s;
+}
+.signup-button:hover {
+    background: #0056b3;
+}
+.footer-text {
+    margin-top: 15px;
+    font-size: 14px;
+    color: #777;
+}
+/*Style login page*/
+.login-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background: linear-gradient(to right, #f0f4f8, #e0e8ef);
+}
+.login-container {
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    width: 400px;
+    text-align: center;
+    transition: transform 0.3s;
+}
+.login-container:hover {
+    transform: scale(1.02);
+}
+h2 {
+    margin-bottom: 20px;
+    color: #007bff;
+    font-size: 24px;
+    font-weight: 600;
+}
+.input-group {
+    margin-bottom: 15px;
+    text-align: left;
+}
+.input-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #555;
+}
+.input-group input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ced4da;
+    border-radius: 5px;
+    transition: border-color 0.3s;
+}
+.input-group input:focus {
+    border-color: #007bff;
+    outline: none;
+}
+.login-button {
+    width: 100%;
+    padding: 10px;
+    background: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background 0.3s;
+}
+.login-button:hover {
+    background: #0056b3;
+}
+.footer-text {
+    margin-top: 15px;
+    font-size: 14px;
+    color: #777;
+}
+/*Contact us style Page*/
+form {
+    display: flex;
+    flex-direction: column;
+}
+label {
+    margin: 10px 0 5px;
+    color: #555;
+}
+input, textarea {
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 16px;
+}
+button {
+    padding: 10px;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+}
+button:hover {
+    background-color: #218838;
+}
+@media (max-width: 600px) {
+    .container {
+        width: 95%;
+    }
+}
+/*Mobile style*/
+@media (max-width: 768px) {
+    nav {
+        cursor: pointer;
+    padding: 10px;
+    background-color: #333; /* Button background */
+    color: white; /* Button text color */
+    text-align: center;
+    }
+    #navMenu {
+        display: none;
+    background-color: rgba(0, 0, 0, 0.9); /* Semi-transparent background */
+    color: white;
+    padding: 10px; /* Padding around menu */
+    z-index: 1000; /* Ensure it’s on top */
+    position: absolute; /* Position relative to the toggle */
+    top: 100px; /* Adjust based on your layout */
+    width: 100%; /* Full width */
+    height: 400;
+    border-radius: 0px; /* Rounded corners */
+    }
+    #navMenu.active {
+        display: flex; /* Show when active */
+        flex-direction: column;
+    gap: 10px;
+    }
+   
+    
+    .menu-toggle {
+        display: block;
+        font-size: 30px;
+        color: white;
+    }
 }

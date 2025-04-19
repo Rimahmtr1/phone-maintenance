@@ -4,7 +4,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Phone Maintenance & Recharge</title>
     <link rel="stylesheet" href="styles.css">
-    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
     <!--Header Part-->
@@ -22,13 +22,50 @@
         </nav>
     </header>
     <!--Main Part-->
-    <div class="main">
-        <div class="overlay">
-            <h1>Welcome to Our Website</h1>
-            <a href="login.html">Login</a>
-            <a href="signup.html">Sign Up</a>
+    <div class="signup-wrapper">
+        <div class="signup-container">
+            <h2>Sign Up</h2>
+            <form id="Signup">
+                <div class="input-group name-fields">
+                    <div>
+                        <label for="first-name">First Name</label>
+                        <input type="text" id="first-name" name="first-name" required>
+                    </div>
+                    <div>
+                        <label for="last-name">Last Name</label>
+                        <input type="text" id="last-name" name="last-name" required>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label for="phone">Phone Number</label>
+                    <div class="phone-fields">
+                        <select class="country-code" id="country-code" name="country-code" required>
+                            <option value="+961" selected>+961 (Lebanon)</option>
+                        </select>
+                        <input type="tel" id="phone" name="phone" required>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+                <div class="input-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" required>
+                    <i class="far fa-eye" id="togglePassword" style="cursor: pointer;"></i>
+                </div>
+                <div class="input-group">
+                    <label for="c-password">Confirm Password</label>
+                    <input type="password" id="c-password" name="c-password" required>
+                    <i class="far fa-eye" id="toggleConfirmPassword" style="cursor: pointer;"></i>
+                </div>
+        </form>
+        <p id="message"></p>
+            <button type="submit" class="signup-button" name="submit" >Sign Up</button>
+            <div class="footer-text">Already have an account? <a href="login.html">Login</a></div>
         </div>
     </div>
+    
 
     <!--Footer Part-->
     <footer class="footer">
@@ -65,5 +102,6 @@
         <p>&copy; Established in 2022. All rights reserved.</p>
     </div>
     <script src="index.js"></script>
+    <script src="signup.js"></script>
 </body>
 </html>
