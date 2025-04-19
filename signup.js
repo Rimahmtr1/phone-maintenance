@@ -1,28 +1,23 @@
 // Import the functions you need from the SDKs you need
-import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-import { getAnalytics } from "firebase/analytics";
-import { getFirestore } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
+        import { initializeApp } from "firebase/app";
+        import { getAnalytics } from "firebase/analytics";
+        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/9.1.3/firebase-firestore.js";
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+          apiKey: "AIzaSyCJsJsuMx1LT6SXZcCqdHa5wkueqXTTT4Q",
+          authDomain: "phone-maintenance-18b38.firebaseapp.com",
+          projectId: "phone-maintenance-18b38",
+          storageBucket: "phone-maintenance-18b38.firebasestorage.app",
+          messagingSenderId: "881648450762",
+          appId: "1:881648450762:web:b17fef83d6015c65a40833",
+          measurementId: "G-0MD0GJJ0E2"
+        };
 
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
-const firebaseConfig = {
-  apiKey: "AIzaSyCJsJsuMx1LT6SXZcCqdHa5wkueqXTTT4Q",
-  authDomain: "phone-maintenance-18b38.firebaseapp.com",
-  projectId: "phone-maintenance-18b38",
-  storageBucket: "phone-maintenance-18b38.firebasestorage.app",
-  messagingSenderId: "881648450762",
-  appId: "1:881648450762:web:b17fef83d6015c65a40833",
-  measurementId: "G-0MD0GJJ0E2"
-};
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+        const db = getFirestore(app);
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-// Import Firebase functions (if you're using modules, otherwise ensure they're included in your HTML)
-// Your web app's Firebase configuration
-const db = getFirestore(app);
-const analytics = getAnalytics(app);
 document.addEventListener('DOMContentLoaded', () => {
     const togglePassword = document.getElementById('togglePassword');
     const toggleConfirmPassword = document.getElementById('toggleConfirmPassword');
