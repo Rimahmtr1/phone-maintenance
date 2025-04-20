@@ -92,6 +92,7 @@
                 if (docSnap.exists()) {
                     const data = docSnap.data();
                     console.log("User data from Firestore:", data);  // Log the fetched data
+                    // Display user data in the profile container
                     document.getElementById('profileInfo').innerHTML = `
                         <div class="profile-item"><strong>First Name:</strong> ${data.firstName}</div>
                         <div class="profile-item"><strong>Last Name:</strong> ${data.lastName}</div>
@@ -100,19 +101,24 @@
                     `;
                 } else {
                     console.error("No profile found for the user.");
-                    document.getElementById('profileInfo').innerHTML = "<p>No profile found!</p
+                    document.getElementById('profileInfo').innerHTML = "<p>No profile found!</p>";
                 }
+            } else {
+                // If no user is logged in, redirect to login page
+                window.location.href = "index.html";
+            }
+        };
 
         // Log out function
         const logout = () => {
             signOut(auth).then(() => {
-                window.location.href = "index.html"; // Redirect to sign-in page after logout
+                window.location.href = "index.html"; // Redirect to login page
             }).catch((error) => {
                 console.error("Error signing out:", error);
             });
         };
 
-        // Call the function to load user profile
+        // Call getUserProfile on page load
         getUserProfile();
     </script>
 
