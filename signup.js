@@ -50,6 +50,7 @@ signUpButton.addEventListener('click', (event) => {
                 firstName: firstName,
                 lastName: lastName,
                 phone: phone,
+                balance=0,
             };
 
             // Save user data to Firestore
