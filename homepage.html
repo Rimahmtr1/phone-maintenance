@@ -104,7 +104,7 @@
         // Log out function
         const logout = () => {
             signOut(auth).then(() => {
-                window.location.href = "index.html"; // Redirect to sign-in page after logout
+                window.location.href = "homepage.html"; // Redirect to sign-in page after logout
             }).catch((error) => {
                 console.error("Error signing out:", error);
             });
