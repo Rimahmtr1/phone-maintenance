@@ -75,4 +75,4 @@ async function saveData(firstName, lastName, phone, email, password) {
 
 // Expose functions to window object
 window.saveData = saveData;
-});
+
