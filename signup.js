@@ -1,7 +1,7 @@
 // Import the necessary Firebase libraries
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.1.3/firebase-app.js";
 import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.1.3/firebase-auth.js";
-import { getFirestore, setDoc, doc } from "https://www.gstatic.com/firebasejs/9.1.3/firebase-firestore.js";
+import { getFirestore, setDoc, doc, getDoc, collection } from "https://www.gstatic.com/firebasejs/9.1.3/firebase-firestore.js";
 
 // Firebase Configuration
 const firebaseConfig = {
@@ -30,21 +30,6 @@ function showMessage(message, divId) {
     }, 5000);
 }
 
-// Function to validate phone number
-function validatePhoneNumber(phone) {
-    const validPrefixes = ['76', '71', '70', '78', '81', '03'];
-    const phonePrefix = phone.substring(0, 2); // Extract first 2 digits
-    const isValidPrefix = validPrefixes.includes(phonePrefix);
-    
-    if (phone.length !== 8) {
-        return 'Phone number must be 8 digits long.';
-    } 
-    if (!isValidPrefix) {
-        return 'Phone number must start with one of the following: 76, 71, 70, 78, 81, or 03.';
-    }
-    return null; // If no errors, return null
-}
-
 // Sign Up Event Listener
 const signUpButton = document.getElementById('submitSignUp');
 signUpButton.addEventListener('click', (event) => {
@@ -54,14 +39,7 @@ signUpButton.addEventListener('click', (event) => {
     const lastName = document.getElementById('last-name').value;
     const email = document.getElementById('email').value;
     const password = document.getElementById('password').value;
-    const phone = document.getElementById('phone').value;
-    
-    // Validate phone number
-    const phoneError = validatePhoneNumber(phone);
-    if (phoneError) {
-        showMessage(phoneError, 'signUpMessage');
-        return; // Stop the process if phone number is invalid
-    }
+    const phone = document.getElementById('country-code').value + document.getElementById('phone').value;
 
     // Firebase Authentication to create the user
     createUserWithEmailAndPassword(auth, email, password)
@@ -71,7 +49,7 @@ signUpButton.addEventListener('click', (event) => {
                 email: email,
                 firstName: firstName,
                 lastName: lastName,
-                phone: `+961${phone}`, // Prefix the phone number with the default country code
+                phone: phone,
             };
 
             // Save user data to Firestore
