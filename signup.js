@@ -40,7 +40,7 @@ signUpButton.addEventListener('click', (event) => {
     const email = document.getElementById('email').value;
     const password = document.getElementById('password').value;
     const phone = document.getElementById('country-code').value + document.getElementById('phone').value;
-    const balance=0;
+    
     // Firebase Authentication to create the user
     createUserWithEmailAndPassword(auth, email, password)
         .then((userCredential) => {
@@ -50,7 +50,7 @@ signUpButton.addEventListener('click', (event) => {
                 firstName: firstName,
                 lastName: lastName,
                 phone: phone,
-                balance:balance,
+                balance: 0,
             };
 
             // Save user data to Firestore
