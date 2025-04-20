@@ -1,7 +1,7 @@
 // Import the functions you need from the SDKs you need
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.1.3/firebase-app.js";
         import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.1.3/firebase-analytics.js";
-        import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/9.1.3/firebase-firestore.js";
+        import { getFirestore, doc, getDoc, setDoc, collection } from "https://www.gstatic.com/firebasejs/9.1.3/firebase-firestore.js";
 
         // Your web app's Firebase configuration
         const firebaseConfig = {
@@ -19,23 +19,7 @@
         const analytics = getAnalytics(app);
         const db = getFirestore(app);
 
- // Function to display a value from Firestore
-async function displayValue() {
-    const docRef = doc(db, 'ph', 'ph1'); // Reference to the document
-    try {
-        const docSnap = await getDoc(docRef);
-        if (docSnap.exists()) {
-            const value = docSnap.data().number; // Access the 'number' field
-            document.getElementById('valueDisplay').innerText = `Value from Firestore: ${value}`; // Display the value
-        } else {
-            document.getElementById('valueDisplay').innerText = "No such document!";
-        }
-    } catch (error) {
-        document.getElementById('valueDisplay').innerText = `Error fetching document: ${error.message}`; // Display error message
-    }
-}
-
-// Function to save data to Firestore
+ // Function to save data to Firestore
 async function saveData(firstName, lastName, phone, email, password) {
     const messageDisplay = document.getElementById('messageDisplay');
     const clientID = await createClientID(); // Generate client ID
@@ -64,8 +48,25 @@ async function createClientID() {
     return `Client-${clientCount}`; // Generate ID in the format Client-ID
 }
 
+// Function to display a value from Firestore (if needed)
+async function displayValue() {
+    const docRef = doc(db, 'ph', 'ph1'); // Reference to the document
+    try {
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+            const value = docSnap.data().number; // Access the 'number' field
+            document.getElementById('valueDisplay').innerText = `Value from Firestore: ${value}`; // Display the value
+        } else {
+            document.getElementById('valueDisplay').innerText = "No such document!";
+        }
+    } catch (error) {
+        document.getElementById('valueDisplay').innerText = `Error fetching document: ${error.message}`; // Display error message
+    }
+}
+
 // Expose functions to window object
 window.saveData = saveData;
+window.displayValue = displayValue; // Expose if needed
 
 // Event listener for form submission
 document.getElementById('Signup').addEventListener('submit', async (e) => {
