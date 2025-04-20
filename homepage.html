@@ -1,92 +1,94 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>User Profile</title>
+    <title>Profile</title>
+    <script type="module" src="homepage.js" defer></script>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f9;
+        * {
             margin: 0;
             padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f7fc;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            flex-direction: column;
         }
 
         .profile-container {
-            max-width: 600px;
-            margin: 50px auto;
-            background-color: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 500px;
+            text-align: center;
         }
 
-        .profile-header {
-            text-align: center;
+        h1 {
             margin-bottom: 20px;
         }
 
-        .profile-header h2 {
-            font-size: 24px;
-            color: #333;
-        }
-
         .profile-info {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
+            margin: 10px 0;
         }
 
-        .profile-info div {
-            font-size: 18px;
-            color: #555;
+        .profile-info span {
+            font-weight: bold;
         }
 
-        .logout-btn {
+        .logout-button {
             margin-top: 20px;
             padding: 10px 20px;
-            background-color: #007bff;
-            color: white;
+            background-color: #007BFF;
+            color: #fff;
             border: none;
-            border-radius: 5px;
+            border-radius: 4px;
             cursor: pointer;
-            font-size: 16px;
         }
 
-        .logout-btn:hover {
+        .logout-button:hover {
             background-color: #0056b3;
         }
 
-        #loading {
-            font-size: 20px;
-            color: #007bff;
-            text-align: center;
+        .loading {
+            font-size: 16px;
+            color: #007BFF;
         }
+
+        .error-message {
+            color: red;
+        }
+
     </style>
 </head>
-
 <body>
-
     <div class="profile-container">
-        <div class="profile-header">
-            <h2>User Profile</h2>
+        <h1>User Profile</h1>
+        <div id="loading" class="loading">Loading your profile...</div>
+        <div id="profileInfo" style="display:none;">
+            <div class="profile-info">
+                <span>First Name:</span> <span id="firstName"></span>
+            </div>
+            <div class="profile-info">
+                <span>Last Name:</span> <span id="lastName"></span>
+            </div>
+            <div class="profile-info">
+                <span>Email:</span> <span id="email"></span>
+            </div>
+            <div class="profile-info">
+                <span>Balance:</span> <span id="balance"></span>
+            </div>
+            <button class="logout-button" id="logoutButton">Log Out</button>
         </div>
-
-        <div id="loading">Loading profile...</div>
-
-        <div class="profile-info" id="profileInfo" style="display: none;">
-            <div><strong>First Name:</strong> <span id="firstName"></span></div>
-            <div><strong>Last Name:</strong> <span id="lastName"></span></div>
-            <div><strong>Email:</strong> <span id="email"></span></div>
-            <div><strong>Balance:</strong> <span id="balance"></span></div>
-        </div>
-
-        <button class="logout-btn" id="logoutButton">Log Out</button>
+        <div id="errorMessage" class="error-message" style="display:none;"></div>
     </div>
-
-    <!-- Import Firebase SDK and your JS script -->
-    <script type="module" src="homepage.js"></script>
 </body>
-
 </html>
