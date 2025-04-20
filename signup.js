@@ -57,8 +57,17 @@ console.error("Error adding document: ", error);
 }
 async function generateClientID() {
     const clientsCollection = await getDocs(collection(db, "signup"));
-    const clientCount = clientsCollection.size + 1; // Count existing clients
-    return `Client-${clientCount}`; // Generate ID in the format Client-ID
+    let maxID = 0;
+
+    // Find the highest existing Client ID
+    clientsCollection.forEach((doc) => {
+        const id = parseInt(doc.id.split('-')[1]); // Extract the number from Client-ID
+        if (id > maxID) {
+            maxID = id;
+        }
+    });
+
+    return `Client-${maxID + 1}`; // Increment the highest ID by 1
 }
 // Function to display an error message
 function dis() {
