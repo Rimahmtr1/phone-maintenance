@@ -48,13 +48,20 @@ function fetchUserData(userId) {
                 document.getElementById('loading').style.display = 'none';
                 document.getElementById('profileInfo').style.display = 'block';
             } else {
-                console.log('No such document!');
+                showError('No profile data found');
             }
         })
         .catch((error) => {
             console.error('Error getting document:', error);
-            document.getElementById('loading').textContent = 'Failed to load profile data.';
+            showError('Failed to load profile data.');
         });
+}
+
+// Show error message
+function showError(message) {
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('errorMessage').style.display = 'block';
+    document.getElementById('errorMessage').textContent = message;
 }
 
 // Log out functionality
