@@ -7,7 +7,7 @@
     
     <script type="module" src="signup.js" defer></script>
     <style>
-        /* General reset */
+       /* General reset */
 * {
     margin: 0;
     padding: 0;
@@ -112,8 +112,13 @@ a:hover {
             <input type="text" id="last-name" placeholder="Last Name" required>
             <input type="email" id="email" placeholder="Email" required>
             <input type="password" id="password" placeholder="Password" required>
-            <input type="text" id="country-code" placeholder="Country Code (e.g. +1)" required>
-            <input type="text" id="phone" placeholder="Phone Number" required>
+            
+            <!-- Country code +961 default -->
+            <input type="text" id="country-code" value="+961" disabled>
+
+            <!-- Phone number input with valid prefix suggestions -->
+            <input type="text" id="phone" placeholder="Phone Number (8 digits starting with 76, 71, 70, 78, 81, 03)" maxlength="8" required>
+            
             <button id="submitSignUp" type="submit">Sign Up</button>
         </form>
         
