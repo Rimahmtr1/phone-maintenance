@@ -40,7 +40,7 @@ async function saveData(firstName, lastName, phone, email, password) {
    const clientID = await generateClientID();
 const messageDisplay = document.getElementById('messageDisplay');
 try {
-await setDoc(doc(db, "signup", "Client"), {
+await setDoc(doc(db, "signup", clientID), {
     Fname: firstName,
     Lname: lastName,
     pnumber: phone,
