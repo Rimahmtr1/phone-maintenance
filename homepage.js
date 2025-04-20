@@ -73,6 +73,6 @@ document.getElementById('logoutButton').addEventListener('click', () => {
         console.error('Logout Error: ', error);
     });
 });
-document.getElementById('returnbutton').addEventListener('click', () => {
+document.getElementById('returnButton').addEventListener('click', () => {
     window.location.href = 'index.html';
 }
