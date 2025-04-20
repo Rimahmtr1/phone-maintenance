@@ -2,6 +2,24 @@ body {
     margin: 0;
     font-family: Arial, sans-serif;
 }
+/* Profile Icon Styling */
+#profileIcon {
+    display: none;
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    width: 40px;
+    height: 40px;
+    background-color: #007BFF;
+    color: white;
+    border-radius: 50%;
+    font-size: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+}
+
 header {
     background-color:#00093b;
     color: #FFFFE0;
