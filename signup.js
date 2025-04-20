@@ -37,6 +37,7 @@ document.getElementById('valueDisplay').innerText = `Error fetching document: ${
 
 // Function to save data to Firestore
 async function saveData(firstName, lastName, phone, email, password) {
+   const clientID = await generateClientID();
 const messageDisplay = document.getElementById('messageDisplay');
 try {
 await setDoc(doc(db, "signup", "Client"), {
@@ -54,7 +55,11 @@ messageDisplay.style.color = "red";
 console.error("Error adding document: ", error);
 }
 }
-
+async function generateClientID() {
+    const clientsCollection = await getDocs(collection(db, "signup"));
+    const clientCount = clientsCollection.size + 1; // Count existing clients
+    return `Client-${clientCount}`; // Generate ID in the format Client-ID
+}
 // Function to display an error message
 function dis() {
 document.getElementById('put').innerText = `Error fetching document:`; // Display error message
