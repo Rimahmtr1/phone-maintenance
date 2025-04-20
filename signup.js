@@ -57,7 +57,7 @@ signUpButton.addEventListener('click', (event) => {
             setDoc(userDocRef, userData)
                 .then(() => {
                     showMessage('Account created successfully!', 'signUpMessage');
-                    window.location.href = "index.html"; // Redirect to homepage after successful signup
+                    window.location.href = "homepage.html"; // Redirect to homepage after successful signup
                 })
                 .catch((error) => {
                     console.error("Error writing document:", error);
