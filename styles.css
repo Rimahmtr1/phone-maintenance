@@ -202,6 +202,11 @@ p {
     margin-right: 15px;
 }
 /*Signup style*/
+.messageDiv{
+    background-color: hsl(327, 90%, 28%);
+    
+
+}
 .signup-wrapper {
     display: flex;
     justify-content: center;

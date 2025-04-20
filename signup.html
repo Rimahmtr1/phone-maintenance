@@ -5,6 +5,7 @@
     <title>Phone Maintenance & Recharge</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+   <script src="signup.js" type="module"></script>
 </head>
 <body>
     <!--Header Part-->
@@ -25,7 +26,8 @@
     <div class="signup-wrapper">
         <div class="signup-container">
             <h2>Sign Up</h2>
-            <form id="Signup">
+            <form id="Signup" method="post" action="">
+                <div id="signInMessage" style="display: none;"></div>
                 <div class="input-group name-fields">
                     <div>
                         <label for="first-name">First Name</label>
@@ -59,14 +61,10 @@
                     <input type="password" id="c-password" name="c-password" required>
                     <i class="far fa-eye" id="toggleConfirmPassword" style="cursor: pointer;"></i>
                 </div>
-        </form>
-        <p id="message"></p>
-        <div id="display-name"></div>
-        <button type="submit" class="signup-button" name="submit" >Sign Up</button>
-            <div class="footer-text">Already have an account? <a href="login.html">Login</a></div>
+                <button type="submit" class="signup-button" id="submitSignUp">Sign Up</button>
+            </form>
         </div>
     </div>
-    
 
     <!--Footer Part-->
     <footer class="footer">
