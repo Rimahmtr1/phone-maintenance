@@ -46,23 +46,33 @@
         document.getElementById('Signup').addEventListener('submit', async (e) => {
             e.preventDefault();
             const firstName = document.getElementById('first-name').value;
-            await saveData(firstName); // Call saveData function
+            const lastName = document.getElementById('last-name').value;
+            const phone = document.getElementById('country-code').value + document.getElementById('phone').value; // Combine country code and phone
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            await saveData(firstName, lastName, phone, email, password); // Call saveData function
         });
+        // Function to save data to Firestore
+async function saveData(firstName, lastName, phone, email, password) {
+    const messageDisplay = document.getElementById('messageDisplay');
+    try {
+        await setDoc(doc(db, "signup", "Client"), {
+            Fname: firstName,
+            Lname: lastName,
+            pnumber: phone,
+            email: email,
+            password: password // Note: Store hashed password instead of plain text
+        });
+        messageDisplay.textContent = `Welcome, ${firstName} ${lastName}! Your sign-up was successful.`;
+        messageDisplay.style.color = "green";
+    } catch (error) {
+        messageDisplay.textContent = "Error saving data. Please try again.";
+        messageDisplay.style.color = "red";
+        console.error("Error adding document: ", error);
+    }
+}
 
-        // Save first name to Firestore
-        try {
-            await setDoc(doc(db, "signup", "Client"), {
-                Fname: firstName
-            });
-            messageDisplay.textContent = `Welcome, ${firstName}! Your sign-up was successful.`;
-            messageDisplay.style.color = "green";
-        } catch (error) {
-            messageDisplay.textContent = "Error saving data. Please try again.";
-            messageDisplay.style.color = "red";
-            console.error("Error adding document: ", error);
-        }
-
-        // Reset form
-        signupForm.reset();
-    });
+// Expose functions to window object
+window.saveData = saveData;
 });
