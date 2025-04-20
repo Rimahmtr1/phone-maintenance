@@ -1,7 +1,9 @@
-import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.1.3/firebase-auth.js";
+// Import necessary Firebase modules
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.1.3/firebase-app.js";
+import { getAuth, signOut } from "https://www.gstatic.com/firebasejs/9.1.3/firebase-auth.js";
 import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/9.1.3/firebase-firestore.js";
 
-// Firebase Configuration
+// Firebase configuration
 const firebaseConfig = {
     apiKey: "AIzaSyCJsJsuMx1LT6SXZcCqdHa5wkueqXTTT4Q",
     authDomain: "phone-maintenance-18b38.firebaseapp.com",
@@ -17,41 +19,49 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth();
 
-// Function to fetch user data from Firestore
-async function getUserData(uid) {
-    const docRef = doc(db, "users", uid);
-    try {
-        const docSnap = await getDoc(docRef);
-        if (docSnap.exists()) {
-            const userData = docSnap.data();
-            document.getElementById("first-name").innerText = userData.firstName;
-            document.getElementById("last-name").innerText = userData.lastName;
-            document.getElementById("email").innerText = userData.email;
-            document.getElementById("balance").innerText = userData.balance;
-        } else {
-            console.error("No user document found!");
-        }
-    } catch (error) {
-        console.error("Error fetching user data: ", error);
-    }
+// Check if user is logged in
+const userId = localStorage.getItem('loggedUserId');
+
+if (!userId) {
+    // Redirect to login page if no user is logged in
+    window.location.href = 'index.html';
+} else {
+    // Fetch user data from Firestore
+    fetchUserData(userId);
 }
 
-// Handle authentication state change (user logged in or not)
-onAuthStateChanged(auth, (user) => {
-    if (user) {
-        // Fetch and display user data if logged in
-        getUserData(user.uid);
-    } else {
-        // If no user is logged in, redirect to login page
-        window.location.href = "index.html";
-    }
-});
+// Fetch user profile data from Firestore
+function fetchUserData(userId) {
+    const userRef = doc(db, "users", userId);
 
-// Logout function
-document.getElementById('logout').addEventListener('click', () => {
+    userRef.get()
+        .then((docSnap) => {
+            if (docSnap.exists()) {
+                const userData = docSnap.data();
+                document.getElementById('firstName').textContent = userData.firstName;
+                document.getElementById('lastName').textContent = userData.lastName;
+                document.getElementById('email').textContent = userData.email;
+                document.getElementById('balance').textContent = userData.balance;
+
+                // Hide loading and show profile info
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('profileInfo').style.display = 'block';
+            } else {
+                console.log('No such document!');
+            }
+        })
+        .catch((error) => {
+            console.error('Error getting document:', error);
+            document.getElementById('loading').textContent = 'Failed to load profile data.';
+        });
+}
+
+// Log out functionality
+document.getElementById('logoutButton').addEventListener('click', () => {
     signOut(auth).then(() => {
-        window.location.href = "index.html"; // Redirect to login page after logout
+        localStorage.removeItem('loggedUserId');
+        window.location.href = 'index.html'; // Redirect to sign-in page
     }).catch((error) => {
-        console.error("Error signing out: ", error);
+        console.error('Logout Error: ', error);
     });
 });
