@@ -1,9 +1,8 @@
-// Import necessary Firebase modules
+// Import the necessary Firebase libraries
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.1.3/firebase-app.js";
-import { getAuth, signOut } from "https://www.gstatic.com/firebasejs/9.1.3/firebase-auth.js";
-import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/9.1.3/firebase-firestore.js";
+import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.1.3/firebase-auth.js";
 
-// Firebase configuration
+// Firebase Configuration
 const firebaseConfig = {
     apiKey: "AIzaSyCJsJsuMx1LT6SXZcCqdHa5wkueqXTTT4Q",
     authDomain: "phone-maintenance-18b38.firebaseapp.com",
@@ -16,60 +15,54 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
 const auth = getAuth();
 
-// Check if user is logged in
-const userId = localStorage.getItem('loggedUserId');
-
-if (!userId) {
-    // Redirect to login page if no user is logged in
-    window.location.href = 'index.html';
-} else {
-    // Fetch user data from Firestore
-    fetchUserData(userId);
+// Show message function
+function showMessage(message, divId) {
+    var messageDiv = document.getElementById(divId);
+    messageDiv.style.display = "block";
+    messageDiv.innerHTML = message;
+    messageDiv.style.opacity = 1;
+    setTimeout(function () {
+        messageDiv.style.opacity = 0;
+    }, 5000);
 }
 
-// Fetch user profile data from Firestore
-function fetchUserData(userId) {
-    const userRef = doc(db, "users", userId);
+// Sign In Event Listener
+const signInButton = document.getElementById('submitSignIn');
+signInButton.addEventListener('click', (event) => {
+    event.preventDefault();
 
-    // Use the getDoc function to retrieve the document data
-    getDoc(userRef)
-        .then((docSnap) => {
-            if (docSnap.exists()) {
-                const userData = docSnap.data();
-                document.getElementById('firstName').textContent = userData.firstName;
-                document.getElementById('lastName').textContent = userData.lastName;
-                document.getElementById('email').textContent = userData.email;
-                document.getElementById('balance').textContent = userData.balance;
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
 
-                // Hide loading and show profile info
-                document.getElementById('loading').style.display = 'none';
-                document.getElementById('profileInfo').style.display = 'block';
-            } else {
-                showError('No profile data found');
-            }
+    // Firebase Authentication to sign the user in
+    signInWithEmailAndPassword(auth, email, password)
+        .then((userCredential) => {
+            const user = userCredential.user;
+            console.log('User signed in:', user);
+
+            // Save user data to localStorage for session persistence
+            localStorage.setItem('loggedUserId', user.uid);
+            
+            // Show success message
+            showMessage('Login successful!', 'signInMessage');
+            
+            // Redirect to the homepage
+            window.location.href = "homepage.html"; 
         })
         .catch((error) => {
-            console.error('Error getting document:', error);
-            showError('Failed to load profile data.');
+            const errorCode = error.code;
+            const errorMessage = error.message;
+            console.error('Error during sign-in:', errorCode, errorMessage);
+
+            // Display error message
+            if (errorCode === 'auth/wrong-password') {
+                showMessage('Incorrect password. Please try again.', 'signInMessage');
+            } else if (errorCode === 'auth/user-not-found') {
+                showMessage('No account found with this email. Please sign up.', 'signInMessage');
+            } else {
+                showMessage('Error logging in: ' + errorMessage, 'signInMessage');
+            }
         });
-}
-
-// Show error message
-function showError(message) {
-    document.getElementById('loading').style.display = 'none';
-    document.getElementById('errorMessage').style.display = 'block';
-    document.getElementById('errorMessage').textContent = message;
-}
-
-// Log out functionality
-document.getElementById('logoutButton').addEventListener('click', () => {
-    signOut(auth).then(() => {
-        localStorage.removeItem('loggedUserId');
-        window.location.href = 'index.html'; // Redirect to sign-in page
-    }).catch((error) => {
-        console.error('Logout Error: ', error);
-    });
 });
