@@ -125,7 +125,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Save first name to Firestore
         try {
-            await setDoc(doc(db, "signup", "Client-1"), {
+            await setDoc(doc(db, "signup", "Client"), {
                 Fname: firstName
             });
             messageDisplay.textContent = `Welcome, ${firstName}! Your sign-up was successful.`;
