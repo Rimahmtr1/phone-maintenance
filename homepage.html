@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,120 +8,85 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
+            background-color: #f4f4f9;
             margin: 0;
+            padding: 0;
         }
 
         .profile-container {
-            background-color: #fff;
+            max-width: 600px;
+            margin: 50px auto;
+            background-color: white;
             padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            width: 300px;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
         }
 
-        h2 {
+        .profile-header {
             text-align: center;
+            margin-bottom: 20px;
         }
 
-        .profile-item {
-            margin: 10px 0;
+        .profile-header h2 {
+            font-size: 24px;
+            color: #333;
         }
 
-        .profile-item strong {
-            font-weight: bold;
+        .profile-info {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
         }
 
-        .logout-button {
-            width: 100%;
-            padding: 10px;
-            background-color: #f44336;
+        .profile-info div {
+            font-size: 18px;
+            color: #555;
+        }
+
+        .logout-btn {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #007bff;
             color: white;
             border: none;
-            border-radius: 4px;
+            border-radius: 5px;
             cursor: pointer;
+            font-size: 16px;
         }
 
-        .logout-button:hover {
-            background-color: #e53935;
+        .logout-btn:hover {
+            background-color: #0056b3;
+        }
+
+        #loading {
+            font-size: 20px;
+            color: #007bff;
+            text-align: center;
         }
     </style>
 </head>
+
 <body>
 
     <div class="profile-container">
-        <h2>User Profile</h2>
-        <div id="profileInfo">
-            <!-- User info will be displayed here -->
+        <div class="profile-header">
+            <h2>User Profile</h2>
         </div>
-        <button class="logout-button" onclick="logout()">Log Out</button>
+
+        <div id="loading">Loading profile...</div>
+
+        <div class="profile-info" id="profileInfo" style="display: none;">
+            <div><strong>First Name:</strong> <span id="firstName"></span></div>
+            <div><strong>Last Name:</strong> <span id="lastName"></span></div>
+            <div><strong>Email:</strong> <span id="email"></span></div>
+            <div><strong>Balance:</strong> <span id="balance"></span></div>
+        </div>
+
+        <button class="logout-btn" id="logoutButton">Log Out</button>
     </div>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.1.3/firebase-app.js";
-        import { getAuth, signOut } from "https://www.gstatic.com/firebasejs/9.1.3/firebase-auth.js";
-        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/9.1.3/firebase-firestore.js";
-
-        // Firebase configuration
-        const firebaseConfig = {
-            apiKey: "AIzaSyCJsJsuMx1LT6SXZcCqdHa5wkueqXTTT4Q",
-            authDomain: "phone-maintenance-18b38.firebaseapp.com",
-            projectId: "phone-maintenance-18b38",
-            storageBucket: "phone-maintenance-18b38.appspot.com",
-            messagingSenderId: "881648450762",
-            appId: "1:881648450762:web:b17fef83d6015c65a40833",
-            measurementId: "G-0MD0GJJ0E2"
-        };
-
-        // Initialize Firebase
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-        const auth = getAuth();
-
-        // Function to get the user's profile from Firestore
-        const getUserProfile = async () => {
-            const user = auth.currentUser;  // Check if a user is logged in
-
-            if (user) {
-                const userDocRef = doc(db, "users", user.uid); // Referencing the user's document in Firestore
-                const docSnap = await getDoc(userDocRef);
-
-                if (docSnap.exists()) {
-                    const data = docSnap.data();
-                    console.log("User data from Firestore:", data);  // Log the fetched data
-                    // Display user data in the profile container
-                    document.getElementById('profileInfo').innerHTML = `
-                        <div class="profile-item"><strong>First Name:</strong> ${data.firstName}</div>
-                        <div class="profile-item"><strong>Last Name:</strong> ${data.lastName}</div>
-                        <div class="profile-item"><strong>Email:</strong> ${data.email}</div>
-                        <div class="profile-item"><strong>Balance:</strong> $${data.balance}</div>
-                    `;
-                } else {
-                    console.error("No profile found for the user.");
-                    document.getElementById('profileInfo').innerHTML = "<p>No profile found!</p>";
-                }
-            } else {
-                // If no user is logged in, redirect to login page
-                window.location.href = "index.html";
-            }
-        };
-
-        // Log out function
-        const logout = () => {
-            signOut(auth).then(() => {
-                window.location.href = "index.html"; // Redirect to login page
-            }).catch((error) => {
-                console.error("Error signing out:", error);
-            });
-        };
-
-        // Call getUserProfile on page load
-        getUserProfile();
-    </script>
-
+    <!-- Import Firebase SDK and your JS script -->
+    <script type="module" src="homepage.js"></script>
 </body>
+
 </html>
