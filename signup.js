@@ -19,7 +19,30 @@
         const analytics = getAnalytics(app);
         const db = getFirestore(app);
 
+ // Function to display a value from Firestore
+        async function displayValue() {
+            const docRef = doc(db, 'ph', 'ph1'); // Reference to the document
+            try {
+                const docSnap = await getDoc(docRef);
+                if (docSnap.exists()) {
+                    const value = docSnap.data().number; // Access the 'number' field
+                    document.getElementById('valueDisplay').innerText = `Value from Firestore: ${value}`; // Display the value
+                } else {
+                    document.getElementById('valueDisplay').innerText = "No such document!";
+                }
+            } catch (error) {
+                document.getElementById('valueDisplay').innerText = `Error fetching document: ${error.message}`; // Display error message
+            }
+        }
 
+        // Function to display an error message
+        function dis() {
+            document.getElementById('put').innerText = `Error fetching document:`; // Display error message
+        }
+
+        // Expose functions to window object
+        window.displayValue = displayValue;
+        window.dis = dis;
 document.addEventListener('DOMContentLoaded', () => {
     const togglePassword = document.getElementById('togglePassword');
     const toggleConfirmPassword = document.getElementById('toggleConfirmPassword');
