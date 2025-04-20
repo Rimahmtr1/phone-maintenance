@@ -34,7 +34,8 @@ if (!userId) {
 function fetchUserData(userId) {
     const userRef = doc(db, "users", userId);
 
-    userRef.get()
+    // Use the getDoc function to retrieve the document data
+    getDoc(userRef)
         .then((docSnap) => {
             if (docSnap.exists()) {
                 const userData = docSnap.data();
