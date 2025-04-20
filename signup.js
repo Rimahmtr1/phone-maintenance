@@ -38,13 +38,15 @@ async function displayValue() {
 // Function to save data to Firestore
 async function saveData(firstName, lastName, phone, email, password) {
     const messageDisplay = document.getElementById('messageDisplay');
+    const clientID = await createClientID(); // Generate client ID
+
     try {
-        await setDoc(doc(db, "signup", "Client"), {
-            Fname: firstName,
-            Lname: lastName,
-            pnumber: phone,
+        await setDoc(doc(db, "signup", clientID), {
             email: email,
-            password: password // Note: Store hashed password instead of plain text
+            pnumber: phone,
+            password: password, // Storing plain text password
+            Fname: firstName,
+            Lname: lastName
         });
         messageDisplay.textContent = `Welcome, ${firstName} ${lastName}! Your sign-up was successful.`;
         messageDisplay.style.color = "green";
@@ -55,14 +57,14 @@ async function saveData(firstName, lastName, phone, email, password) {
     }
 }
 
-// Function to display an error message
-function dis() {
-    document.getElementById('put').innerText = `Error fetching document:`; // Display error message
+// Function to create a new client ID
+async function createClientID() {
+    const clientsCollection = await getDocs(collection(db, "signup"));
+    const clientCount = clientsCollection.size + 1; // Count existing clients
+    return `Client-${clientCount}`; // Generate ID in the format Client-ID
 }
 
 // Expose functions to window object
-window.displayValue = displayValue;
-window.dis = dis;
 window.saveData = saveData;
 
 // Event listener for form submission
