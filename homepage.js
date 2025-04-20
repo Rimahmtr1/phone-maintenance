@@ -73,3 +73,5 @@ document.getElementById('logoutButton').addEventListener('click', () => {
         console.error('Logout Error: ', error);
     });
 });
+document.getElementById('returnbutton').addEventListener('click', () => {
+}
