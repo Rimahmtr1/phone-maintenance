@@ -19,7 +19,7 @@
         const analytics = getAnalytics(app);
         const db = getFirestore(app);
 
- // Function to save data to Firestore
+// Function to save data to Firestore
 async function saveData(firstName, lastName, phone, email, password) {
     const messageDisplay = document.getElementById('messageDisplay');
     const clientID = await createClientID(); // Generate client ID
@@ -48,7 +48,7 @@ async function createClientID() {
     return `Client-${clientCount}`; // Generate ID in the format Client-ID
 }
 
-// Function to display a value from Firestore (if needed)
+// Function to display a value from Firestore (optional)
 async function displayValue() {
     const docRef = doc(db, 'ph', 'ph1'); // Reference to the document
     try {
@@ -66,7 +66,7 @@ async function displayValue() {
 
 // Expose functions to window object
 window.saveData = saveData;
-window.displayValue = displayValue; // Expose if needed
+window.displayValue = displayValue; // Include if you need it
 
 // Event listener for form submission
 document.getElementById('Signup').addEventListener('submit', async (e) => {
