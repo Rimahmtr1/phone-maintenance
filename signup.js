@@ -20,40 +20,22 @@
         const db = getFirestore(app);
 
  // Function to display a value from Firestore
-        async function displayValue() {
-            const docRef = doc(db, 'ph', 'ph1'); // Reference to the document
-            try {
-                const docSnap = await getDoc(docRef);
-                if (docSnap.exists()) {
-                    const value = docSnap.data().number; // Access the 'number' field
-                    document.getElementById('valueDisplay').innerText = `Value from Firestore: ${value}`; // Display the value
-                } else {
-                    document.getElementById('valueDisplay').innerText = "No such document!";
-                }
-            } catch (error) {
-                document.getElementById('valueDisplay').innerText = `Error fetching document: ${error.message}`; // Display error message
-            }
+async function displayValue() {
+    const docRef = doc(db, 'ph', 'ph1'); // Reference to the document
+    try {
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+            const value = docSnap.data().number; // Access the 'number' field
+            document.getElementById('valueDisplay').innerText = `Value from Firestore: ${value}`; // Display the value
+        } else {
+            document.getElementById('valueDisplay').innerText = "No such document!";
         }
+    } catch (error) {
+        document.getElementById('valueDisplay').innerText = `Error fetching document: ${error.message}`; // Display error message
+    }
+}
 
-        // Function to display an error message
-        function dis() {
-            document.getElementById('put').innerText = `Error fetching document:`; // Display error message
-        }
-
-        // Expose functions to window object
-        window.displayValue = displayValue;
-        window.dis = dis;
-        document.getElementById('Signup').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const firstName = document.getElementById('first-name').value;
-            const lastName = document.getElementById('last-name').value;
-            const phone = document.getElementById('country-code').value + document.getElementById('phone').value; // Combine country code and phone
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-
-            await saveData(firstName, lastName, phone, email, password); // Call saveData function
-        });
-        // Function to save data to Firestore
+// Function to save data to Firestore
 async function saveData(firstName, lastName, phone, email, password) {
     const messageDisplay = document.getElementById('messageDisplay');
     try {
@@ -73,6 +55,25 @@ async function saveData(firstName, lastName, phone, email, password) {
     }
 }
 
+// Function to display an error message
+function dis() {
+    document.getElementById('put').innerText = `Error fetching document:`; // Display error message
+}
+
 // Expose functions to window object
+window.displayValue = displayValue;
+window.dis = dis;
 window.saveData = saveData;
+
+// Event listener for form submission
+document.getElementById('Signup').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const firstName = document.getElementById('first-name').value;
+    const lastName = document.getElementById('last-name').value;
+    const phone = document.getElementById('country-code').value + document.getElementById('phone').value; // Combine country code and phone
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+
+    await saveData(firstName, lastName, phone, email, password); // Call saveData function
+});
 
