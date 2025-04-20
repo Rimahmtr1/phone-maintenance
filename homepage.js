@@ -24,7 +24,7 @@ const userId = localStorage.getItem('loggedUserId');
 
 if (!userId) {
     // Redirect to login page if no user is logged in
-    window.location.href = 'index.html';
+    window.location.href = 'signup.html';
 } else {
     // Fetch user data from Firestore
     fetchUserData(userId);
