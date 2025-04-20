@@ -83,7 +83,7 @@
 
         // Function to get the user's profile from Firestore
         const getUserProfile = async () => {
-            const user = auth.currentUser;
+            const user = auth.currentUser;  // Check if a user is logged in
 
             if (user) {
                 const userDocRef = doc(db, "users", user.uid); // Referencing the user's document in Firestore
@@ -99,12 +99,12 @@
                         <div class="profile-item"><strong>Balance:</strong> $${data.balance}</div>
                     `;
                 } else {
-                    // If no user data found
+                    // If no user data found in Firestore
                     document.getElementById('profileInfo').innerHTML = "<p>No profile found!</p>";
                 }
             } else {
-                // If no user is logged in
-                document.getElementById('profileInfo').innerHTML = "<p>Please log in to view your profile.</p>";
+                // If the user is not logged in, redirect to login page (index.html)
+                window.location.href = "index.html";
             }
         };
 
