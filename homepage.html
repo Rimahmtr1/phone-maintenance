@@ -101,3 +101,20 @@
                 } else {
                     console.error("No profile found for the user.");
                     document.getElementById('profileInfo').innerHTML = "<p>No profile found!</p
+                }
+
+        // Log out function
+        const logout = () => {
+            signOut(auth).then(() => {
+                window.location.href = "index.html"; // Redirect to sign-in page after logout
+            }).catch((error) => {
+                console.error("Error signing out:", error);
+            });
+        };
+
+        // Call the function to load user profile
+        getUserProfile();
+    </script>
+
+</body>
+</html>
