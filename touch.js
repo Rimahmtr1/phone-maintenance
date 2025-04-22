@@ -1,8 +1,16 @@
 // Ensure Firebase functions are loaded as modules
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.1.3/firebase-app.js";
 import { getAuth, signOut } from "https://www.gstatic.com/firebasejs/9.1.3/firebase-auth.js";
-import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/9.1.3/firebase-firestore.js";
-
+import {
+    getFirestore,
+    collection,
+    query,
+    where,
+    limit,
+    getDocs,
+    updateDoc,
+    doc
+} from "https://www.gstatic.com/firebasejs/9.1.3/firebase-firestore.js";
 // Firebase configuration
 const firebaseConfig = {
     apiKey: "AIzaSyCJsJsuMx1LT6SXZcCqdHa5wkueqXTTT4Q",
@@ -42,10 +50,42 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
-    // Placeholder for balance checking (implement as necessary)
-    function checkBalance() {
-        alert("Checking balance... (user is logged in)");
+    // Simulated user balance (replace this with real data from Firestore or your backend)
+async function checkBalance() {
+    const balance = 850000; // Example value, replace this with real balance logic
+
+    if (balance >= 800000) {
+        getOneAvailableItemCode();
+    } else {
+        alert("You don't have enough balance.");
     }
+}
+
+async function getOneAvailableItemCode() {
+    const itemsRef = collection(db, "items");
+    const q = query(itemsRef, where("selected", "==", false), limit(1));
+
+    try {
+        const querySnapshot = await getDocs(q);
+
+        if (!querySnapshot.empty) {
+            const itemDoc = querySnapshot.docs[0];
+            const itemId = itemDoc.id;
+            const itemData = itemDoc.data();
+
+            // Display the item-code to the user
+            alert("Your item code is: " + itemData["item-code"]);
+
+            // Mark it as selected
+            const itemRef = doc(db, "items", itemId);
+            await updateDoc(itemRef, { selected: true });
+        } else {
+            alert("Sold out. No more item codes available.");
+        }
+    } catch (error) {
+        alert("Error fetching item code: " + error.message);
+    }
+}
 
     // Attach event listeners after the DOM is loaded
     const openAlertBtn = document.getElementById("openAlertBtn");
