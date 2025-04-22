@@ -39,7 +39,6 @@ document.addEventListener("DOMContentLoaded", function () {
         document.getElementById('customAlert').style.display = 'none';
     }
 
-    // Button event listener setup
     const openAlertBtn = document.getElementById("openAlertBtn");
     const closeAlertBtn = document.getElementById("closeAlertBtn");
     const buyBtn = document.getElementById("buyBtn");
@@ -102,9 +101,9 @@ document.addEventListener("DOMContentLoaded", function () {
             alert("Error fetching item code: " + error.message);
         }
     }
-}); // ✅ Close DOMContentLoaded listener properly
+}); // ✅ closes DOMContentLoaded
 
-// ✅ This should be outside the DOMContentLoaded listener
+// ✅ Keep this outside DOMContentLoaded
 function showItemCode(code) {
     window.location.href = `touch-buy.html?code=${encodeURIComponent(code)}`;
 }
