@@ -11,7 +11,7 @@ import {
     updateDoc,
     doc,
     getDoc,
-    addDoc // ✅ Ensure this is imported
+    addDoc
 } from "https://www.gstatic.com/firebasejs/9.1.3/firebase-firestore.js";
 
 // Firebase Configuration
@@ -31,7 +31,6 @@ const db = getFirestore(app);
 const auth = getAuth();
 
 document.addEventListener("DOMContentLoaded", function () {
-    // UI functions
     function openAlert() {
         document.getElementById('customAlert').style.display = 'flex';
     }
@@ -46,19 +45,15 @@ document.addEventListener("DOMContentLoaded", function () {
 
     if (openAlertBtn) openAlertBtn.addEventListener("click", openAlert);
     if (closeAlertBtn) closeAlertBtn.addEventListener("click", closeAlert);
-    if (buyBtn) buyBtn.addEventListener("click", handleAction);
-
-    function handleAction() {
-        const isConfirmed = confirm("Are you sure you want to buy this item?");
-        if (!isConfirmed) return;
-
+    if (buyBtn) buyBtn.addEventListener("click", () => {
+        closeAlert(); // Hide modal first
         const userId = localStorage.getItem('loggedUserId');
         if (userId) {
             checkBalance(userId);
         } else {
             alert("Please log in or sign up to continue.");
         }
-    }
+    });
 
     async function checkBalance(userId) {
         try {
@@ -77,11 +72,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
             const itemCode = itemData["item-code"];
 
-            // Update balance after securing item
             const newBalance = balance - 800000;
             await updateDoc(userRef, { balance: newBalance });
 
-            // ✅ Log the transaction
             await logTransaction(userId, itemCode);
 
             showItemCode(itemCode);
@@ -131,7 +124,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 itemcode: itemCode
             };
             await addDoc(transactionsRef, transactionData);
-            console.log("Transaction logged:", transactionData); // for debugging
+            console.log("Transaction logged:", transactionData);
         } catch (error) {
             console.error("Failed to log transaction:", error.message);
         }
