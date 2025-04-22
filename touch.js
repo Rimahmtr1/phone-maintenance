@@ -48,6 +48,12 @@ function checkBalance() {
 
 // Add the event listener when the page is loaded
 document.addEventListener("DOMContentLoaded", function() {
+    // Use a more specific selector and make sure it finds the element
     const alertLink = document.querySelector('a[onclick="openAlert()"]');
-    alertLink.addEventListener('click', openAlert);
+    
+    if (alertLink) {
+        alertLink.addEventListener('click', openAlert);
+    } else {
+        console.error("Element not found!");
+    }
 });
