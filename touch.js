@@ -41,13 +41,18 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const openAlertBtn = document.getElementById("openAlertBtn");
     const closeAlertBtn = document.getElementById("closeAlertBtn");
+    const closeAlertBtn2 = document.getElementById("closeAlertBtn2");
     const buyBtn = document.getElementById("buyBtn");
 
     if (openAlertBtn) openAlertBtn.addEventListener("click", openAlert);
     if (closeAlertBtn) closeAlertBtn.addEventListener("click", closeAlert);
+    if (closeAlertBtn2) closeAlertBtn2.addEventListener("click", closeAlert);
     if (buyBtn) buyBtn.addEventListener("click", handleAction);
 
     function handleAction() {
+        const confirmed = confirm("Are you sure you want to buy this item for 800,000 LBP?");
+        if (!confirmed) return;
+
         const userId = localStorage.getItem('loggedUserId');
         if (userId) {
             checkBalance(userId);
@@ -68,10 +73,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
             if (balance < 800000) return alert("You don't have enough balance.");
 
-            const itemData = await getOneAvailableItemCode(userId); // 🔁 Pass userId
-            if (!itemData) return; // ⛔ Don't show anything if item was not assigned
+            const itemData = await getOneAvailableItemCode(userId);
+            if (!itemData) return;
 
-            // 👇 Update balance AFTER item was secured
             const newBalance = balance - 800000;
             await updateDoc(userRef, { balance: newBalance });
 
@@ -101,7 +105,7 @@ document.addEventListener("DOMContentLoaded", function () {
             const itemRef = doc(db, "items", itemId);
             await updateDoc(itemRef, {
                 selected: true,
-                selectedBy: userId // 🔥 this is required for rule to pass
+                selectedBy: userId
             });
 
             return itemData;
@@ -112,9 +116,8 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
-    // ✅ This function lives outside DOMContentLoaded
     function showItemCode(code) {
         window.location.href = `touch-buy.html?code=${encodeURIComponent(code)}`;
     }
 
-}); // Closes DOMContentLoaded
+});
