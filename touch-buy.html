@@ -33,18 +33,6 @@
     <div id="itemCodeText">Loading...</div>
   </div>
 
-  <!-- ✅ Put script at the END of body -->
-  <script>
-    document.addEventListener("DOMContentLoaded", function () {
-      const urlParams = new URLSearchParams(window.location.search);
-      const code = urlParams.get('code');
-      const codeElement = document.getElementById('itemCodeText');
-      if (code && codeElement) {
-        codeElement.textContent = code;
-      } else {
-        codeElement.textContent = 'No code available';
-      }
-    });
-  </script>
+  
 </body>
 </html>
