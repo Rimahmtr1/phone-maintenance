@@ -48,6 +48,12 @@ document.addEventListener("DOMContentLoaded", function () {
     if (buyBtn) buyBtn.addEventListener("click", handleAction);
 
     function handleAction() {
+        // Confirmation prompt
+        const isConfirmed = confirm("Are you sure you want to buy this item?");
+        if (!isConfirmed) {
+            return; // Exit if not confirmed
+        }
+
         const userId = localStorage.getItem('loggedUserId');
         if (userId) {
             checkBalance(userId);
