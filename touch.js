@@ -94,10 +94,11 @@ async function checkBalance(userId) {
                 const itemId = itemDoc.id;
                 const itemData = itemDoc.data();
 
+                 showItemCode(itemData["item-code"]);
                  // Mark as selected
                 const itemRef = doc(db, "items", itemId);
                 await updateDoc(itemRef, { selected: true });
-                 showItemCode(itemData["item-code"]);
+                
                 
             } else {
                 alert("Sold out. No more item codes available.");
