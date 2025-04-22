@@ -1,93 +1,120 @@
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Phone Maintenance & Recharge</title>
-    <link rel="stylesheet" href="styles.css">
-    <!-- Use defer and type="module" for the script -->
-    <script src="touch.js" type="module" defer></script>
-</head>
-<body>
-    <!-- Header Part -->
-    <header>
-        <div class="logo">
-            <img alt="logo" src="img/logo.png" />
-            <h1>Phone Maintenance & Recharge</h1>
-        </div>
-         <div class="menu-toggle" id="menuToggle">☰</div>
-        <nav id="navMenu">
-            <a href="index.html">Home</a>
-            <a href="about-us.html">About</a>
-            <a href="services.html">Services</a>
-            <a href="contact-us.html">Contact</a>
-            
+// Firebase Modules
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.1.3/firebase-app.js";
+import { getAuth } from "https://www.gstatic.com/firebasejs/9.1.3/firebase-auth.js";
+import {
+    getFirestore,
+    collection,
+    query,
+    where,
+    limit,
+    getDocs,
+    updateDoc,
+    doc,
+    getDoc
+} from "https://www.gstatic.com/firebasejs/9.1.3/firebase-firestore.js";
 
-        </nav>
-        <a href="homepage.html">
-              <img src="https://static.vecteezy.com/system/resources/previews/005/544/718/non_2x/profile-icon-design-free-vector.jpg" alt="User Icon" width="50" height="50">
-            </a>
-    </header>
+// Firebase Configuration
+const firebaseConfig = {
+    apiKey: "AIzaSyCJsJsuMx1LT6SXZcCqdHa5wkueqXTTT4Q",
+    authDomain: "phone-maintenance-18b38.firebaseapp.com",
+    projectId: "phone-maintenance-18b38",
+    storageBucket: "phone-maintenance-18b38.appspot.com",
+    messagingSenderId: "881648450762",
+    appId: "1:881648450762:web:b17fef83d6015c65a40833",
+    measurementId: "G-0MD0GJJ0E2"
+};
 
-    <!-- Main Part -->
-    <div class="middle">
-        <div class="section">
-            
-            <a id="openAlertBtn" href="javascript:void(0);" class="background-image">
-                <img src="img/mtc-7.58$.jpg" class="background-image" />
-            </a>
-        </div>
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const auth = getAuth();
 
-        <!-- Custom Alert Box -->
-        <div id="customAlert" class="alert-overlay">
-            <div class="alert-box">
-                <span class="close-btn" id="closeAlertBtn">&times;</span>
-                <h2>Touch Card - 7.58$</h2>
-                <h3>Description</h3>
-                <p>
-                    Card $7.58 <br>
-                    Valid for 1 month — includes $7.58 in credits. <br>
-                    Price: 800,000 LBP
-                </p>
-                <button id="buyBtn">Buy</button>
-            </div>
-        </div>
-    </div>
+document.addEventListener("DOMContentLoaded", function () {
+    // UI functions
+    function openAlert() {
+        document.getElementById('customAlert').style.display = 'flex';
+    }
 
-    <!-- Footer Part -->
-    <footer class="footer">
-        <div class="footer-container">
-            <div class="footer-section">
-                <h2>About Us</h2>
-                <p>Founded in 2022, Phone Maintenance and Recharge offers comprehensive services, including phone maintenance, sales of Touch and Alfa cards, and various recharge options. Our goal is to ensure customer satisfaction through quality service and a wide range of products.</p>
-            </div>
-            <div class="footer-section">
-                <h2>Quick Links</h2>
-                <ul>
-                    <li><a href="index.html">Home</a></li>
-                    <li><a href="services.html">Services</a></li>
-                    <li><a href="about-us.html">About Us</a></li>
-                    <li><a href="contact-us.html">Contact</a></li>
-                </ul>
-            </div>
-            <div class="footer-section">
-                <h2>Contact Us</h2>
-                <p>Email: <a href="mailto:remahmattar@gmail.com">remahmattar@gmail.com</a></p>
-                <p>Phone: <a href="tel:+96171282169">+961-71282169</a></p>
-            </div>
-            <div class="footer-section">
-                <h2>Follow Us</h2>
-                <ul class="socials">
-                    <li><a href="#" class="icon-facebook">Facebook</a></li>
-                    <li><a href="https://www.instagram.com/phone_maintenance_and_recharge?igsh=emhncXM5YWpleHgx" class="icon-Instagram">Instagram</a></li>
-                </ul>
-            </div>
-        </div>
-    </footer>
+    function closeAlert() {
+        document.getElementById('customAlert').style.display = 'none';
+    }
 
-    <div class="footer-bottom">
-        <p>&copy; Established in 2022. All rights reserved.</p>
-    </div>
+    const openAlertBtn = document.getElementById("openAlertBtn");
+    const closeAlertBtn = document.getElementById("closeAlertBtn");
+    const buyBtn = document.getElementById("buyBtn");
 
-    <script src="index.js"></script>
-</body>
-</html>
+    if (openAlertBtn) openAlertBtn.addEventListener("click", openAlert);
+    if (closeAlertBtn) closeAlertBtn.addEventListener("click", closeAlert);
+    if (buyBtn) buyBtn.addEventListener("click", handleAction);
+
+    function handleAction() {
+        const userId = localStorage.getItem('loggedUserId');
+        if (userId) {
+            checkBalance(userId);
+        } else {
+            alert("Please log in or sign up to continue.");
+        }
+    }
+
+    async function checkBalance(userId) {
+        try {
+            const userRef = doc(db, "users", userId);
+            const userSnap = await getDoc(userRef);
+
+            if (!userSnap.exists()) return alert("User data not found.");
+
+            const userData = userSnap.data();
+            const balance = userData.balance || 0;
+
+            if (balance < 800000) return alert("You don't have enough balance.");
+
+            const itemData = await getOneAvailableItemCode(userId); // 🔁 Pass userId
+            if (!itemData) return; // ⛔ Don't show anything if item was not assigned
+
+            // 👇 Update balance AFTER item was secured
+            const newBalance = balance - 800000;
+            await updateDoc(userRef, { balance: newBalance });
+
+            showItemCode(itemData["item-code"]);
+
+        } catch (error) {
+            alert("Error checking balance: " + error.message);
+        }
+    }
+
+    async function getOneAvailableItemCode(userId) {
+        const itemsRef = collection(db, "items");
+        const q = query(itemsRef, where("selected", "==", false), limit(1));
+
+        try {
+            const querySnapshot = await getDocs(q);
+
+            if (querySnapshot.empty) {
+                alert("Sold out. No more item codes available.");
+                return null;
+            }
+
+            const itemDoc = querySnapshot.docs[0];
+            const itemId = itemDoc.id;
+            const itemData = itemDoc.data();
+
+            const itemRef = doc(db, "items", itemId);
+            await updateDoc(itemRef, {
+                selected: true,
+                selectedBy: userId // 🔥 this is required for rule to pass
+            });
+
+            return itemData;
+
+        } catch (error) {
+            alert("Error fetching item code: " + error.message);
+            return null;
+        }
+    }
+
+    // ✅ This function lives outside DOMContentLoaded
+    function showItemCode(code) {
+        window.location.href = `touch-buy.html?code=${encodeURIComponent(code)}`;
+    }
+
+}); // Closes DOMContentLoaded
