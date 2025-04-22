@@ -1,12 +1,14 @@
-
-  function openAlert() {
+// Function to open the alert box
+function openAlert() {
     document.getElementById('customAlert').style.display = 'flex';
-  }
+}
 
-  function closeAlert() {
+// Function to close the alert box
+function closeAlert() {
     document.getElementById('customAlert').style.display = 'none';
-  }
-  // Import necessary Firebase modules
+}
+
+// Firebase setup
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.1.3/firebase-app.js";
 import { getAuth, signOut } from "https://www.gstatic.com/firebasejs/9.1.3/firebase-auth.js";
 import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/9.1.3/firebase-firestore.js";
@@ -29,15 +31,17 @@ const auth = getAuth();
 
 // Check if user is logged in
 const userId = localStorage.getItem('loggedUserId');
-  function handleAction() {
-    if (userId) {
-      checkBalance(); // Go to the balance check
-    } else {
-      alert("Please log in or sign up to continue.");
-    }
-  }
 
-  function checkBalance() {
-    // Example placeholder for actual balance check logic
+// Function to handle buy action (check if logged in)
+function handleAction() {
+    if (userId) {
+        checkBalance(); // Go to the balance check if logged in
+    } else {
+        alert("Please log in or sign up to continue.");
+    }
+}
+
+// Function to check balance (placeholder for actual logic)
+function checkBalance() {
     alert("Checking balance... (user is logged in)");
-  }
+}
