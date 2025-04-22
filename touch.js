@@ -49,7 +49,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function handleAction() {
         // Display confirmation alert before proceeding with the purchase
-        const confirmed = confirm("Are you sure you want to buy this item ?");
+        const confirmed = confirm("Are you sure you want to buy this item for 800,000 LBP?");
         
         if (confirmed) {
             const userId = localStorage.getItem('loggedUserId');
