@@ -48,7 +48,6 @@ document.addEventListener("DOMContentLoaded", function () {
     if (closeAlertBtn) closeAlertBtn.addEventListener("click", closeAlert);
     if (buyBtn) buyBtn.addEventListener("click", handleAction);
 
-    // Main buy button action
     function handleAction() {
         const userId = localStorage.getItem('loggedUserId');
         if (userId) {
@@ -57,59 +56,55 @@ document.addEventListener("DOMContentLoaded", function () {
             alert("Please log in or sign up to continue.");
         }
     }
-async function checkBalance(userId) {
-    try {
-        const userRef = doc(db, "users", userId);
-        const userSnap = await getDoc(userRef);
 
-        if (userSnap.exists()) {
-            const userData = userSnap.data(); // ✅ define inside this block
-            const balance = userData.balance || 0;
+    async function checkBalance(userId) {
+        try {
+            const userRef = doc(db, "users", userId);
+            const userSnap = await getDoc(userRef);
 
-            if (balance >= 800000) {
-                await getOneAvailableItemCode(); // ✅ wait for it
+            if (userSnap.exists()) {
+                const userData = userSnap.data();
+                const balance = userData.balance || 0;
+
+                if (balance >= 800000) {
+                    await getOneAvailableItemCode();
+                } else {
+                    alert("You don't have enough balance.");
+                }
             } else {
-                alert("You don't have enough balance.");
+                alert("User data not found.");
             }
-        } else {
-            alert("User data not found.");
+        } catch (error) {
+            alert("Error checking balance: " + error.message);
         }
-    } catch (error) {
-        alert("Error checking balance: " + error.message);
     }
-}
 
+    async function getOneAvailableItemCode() {
+        const itemsRef = collection(db, "items");
+        const q = query(itemsRef, where("selected", "==", false), limit(1));
 
+        try {
+            const querySnapshot = await getDocs(q);
 
-   // Get an unused item code and mark it as selected
-async function getOneAvailableItemCode() {
-    const itemsRef = collection(db, "items");
-    const q = query(itemsRef, where("selected", "==", false), limit(1));
+            if (!querySnapshot.empty) {
+                const itemDoc = querySnapshot.docs[0];
+                const itemId = itemDoc.id;
+                const itemData = itemDoc.data();
 
-    try {
-        const querySnapshot = await getDocs(q);
+                const itemRef = doc(db, "items", itemId);
+                await updateDoc(itemRef, { selected: true });
 
-        if (!querySnapshot.empty) {
-            const itemDoc = querySnapshot.docs[0];
-            const itemId = itemDoc.id;
-            const itemData = itemDoc.data();
-
-            const itemRef = doc(db, "items", itemId);
-            await updateDoc(itemRef, { selected: true });
-
-            // ✅ Now redirect AFTER it's marked as selected
-            showItemCode(itemData["item-code"]);
-
-        } else {
-            alert("Sold out. No more item codes available.");
+                showItemCode(itemData["item-code"]);
+            } else {
+                alert("Sold out. No more item codes available.");
+            }
+        } catch (error) {
+            alert("Error fetching item code: " + error.message);
         }
-    } catch (error) {
-        alert("Error fetching item code: " + error.message);
     }
-}
+}); // ✅ Close DOMContentLoaded listener properly
 
+// ✅ This should be outside the DOMContentLoaded listener
 function showItemCode(code) {
-    // Redirect to touch-buy.html with the code as a query parameter
     window.location.href = `touch-buy.html?code=${encodeURIComponent(code)}`;
 }
-
