@@ -50,7 +50,7 @@ document.addEventListener("DOMContentLoaded", function () {
     if (buyBtn) buyBtn.addEventListener("click", handleAction);
 
     function handleAction() {
-        const confirmed = confirm("Are you sure you want to buy this item for 800,000 LBP?");
+        const confirmed = alert("Are you sure you want to buy this item for 800,000 LBP?");
         if (!confirmed) return;
 
         const userId = localStorage.getItem('loggedUserId');
