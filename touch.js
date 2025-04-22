@@ -99,8 +99,10 @@ async function getOneAvailableItemCode(userId) {
         const itemRef = doc(db, "items", itemId);
         await updateDoc(itemRef, {
             selected: true,
-            selectedBy: userId // 👈 Required by Firestore rules
+            selectedBy: userId // 🔥 this is required for rule to pass
         });
+
+        
 
         return itemData;
 
