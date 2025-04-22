@@ -31,14 +31,12 @@ const db = getFirestore(app);
 const auth = getAuth();
 
 document.addEventListener("DOMContentLoaded", function () {
-    const openAlertBtn = document.getElementById("openAlertBtn");
-    const closeAlertBtn = document.getElementById("closeAlertBtn");
     const buyBtn = document.getElementById("buyBtn");
 
-    // Open confirmation alert before buying
-    if (openAlertBtn) {
-        openAlertBtn.addEventListener("click", async function () {
-            // Ask for user confirmation before proceeding
+    // Listen for "Buy" button click
+    if (buyBtn) {
+        buyBtn.addEventListener("click", async function () {
+            // Ask for user confirmation before proceeding with the purchase
             const confirmBuy = confirm("Are you sure you want to buy?");
             if (!confirmBuy) return; // Exit if user cancels
 
@@ -68,8 +66,6 @@ document.addEventListener("DOMContentLoaded", function () {
             showItemCode(itemData["item-code"]);
         });
     }
-
-    if (closeAlertBtn) closeAlertBtn.addEventListener("click", closeAlert);
 
     // Function to get available item code
     async function getOneAvailableItemCode(userId) {
@@ -135,11 +131,6 @@ document.addEventListener("DOMContentLoaded", function () {
     // Function to show item code on the next page
     function showItemCode(code) {
         window.location.href = `touch-buy.html?code=${encodeURIComponent(code)}`;
-    }
-
-    // Close alert
-    function closeAlert() {
-        document.getElementById('customAlert').style.display = 'none';
     }
 
 }); // Closes DOMContentLoaded
