@@ -1,14 +1,4 @@
-// Function to open the alert box
-function openAlert() {
-    document.getElementById('customAlert').style.display = 'flex';
-}
-
-// Function to close the alert box
-function closeAlert() {
-    document.getElementById('customAlert').style.display = 'none';
-}
-
-// Firebase setup
+// Ensure Firebase functions are loaded as modules
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.1.3/firebase-app.js";
 import { getAuth, signOut } from "https://www.gstatic.com/firebasejs/9.1.3/firebase-auth.js";
 import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/9.1.3/firebase-firestore.js";
@@ -29,19 +19,28 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth();
 
-// Check if user is logged in
+// Ensure this function is declared before being used in the HTML
+function openAlert() {
+    document.getElementById('customAlert').style.display = 'flex';
+}
+
+function closeAlert() {
+    document.getElementById('customAlert').style.display = 'none';
+}
+
+// Check if the user is logged in
 const userId = localStorage.getItem('loggedUserId');
 
-// Function to handle buy action (check if logged in)
+// Handle action after clicking "Buy"
 function handleAction() {
     if (userId) {
-        checkBalance(); // Go to the balance check if logged in
+        checkBalance(); // Go to the balance check
     } else {
         alert("Please log in or sign up to continue.");
     }
 }
 
-// Function to check balance (placeholder for actual logic)
+// Placeholder for balance checking (implement as necessary)
 function checkBalance() {
     alert("Checking balance... (user is logged in)");
 }
