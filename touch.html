@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Phone Maintenance & Recharge</title>
     <link rel="stylesheet" href="styles.css">
-    <script src="touch.js" type="module" defer></script>
+    <script type="module" src="touch.js"></script>
 </head>
 <body>
     <!--Header Part-->
@@ -29,7 +29,8 @@
     <!--Main Part-->
     <div class="middle">
         <div class="section">
-            <a id="openAlertBtn"  class="background-image">
+            <h2>TOUCH Card-7.58$</h2>
+            <a id="openAlertBtn" class="background-image">
                 <img src="img/mtc-7.58$.jpg" alt="Touch Card Image" class="background-image" />
             </a>
         </div>
@@ -38,7 +39,7 @@
     <!-- Custom Alert Box -->
     <div id="customAlert" class="alert-overlay">
         <div class="alert-box">
-            <span class="close-btn" onclick="closeAlert()">&times;</span>
+            <span class="close-btn" id="closeAlertBtn">&times;</span>
             <h2>Touch Card-7.58$</h2>
             <h3>Description</h3>
             <p>
@@ -46,8 +47,8 @@
                 Valid for 1 month — includes $7.58 in credits.<br>
                 Price: 800,000LBP
             </p>
-            <button onclick="closeAlert()">Close</button>
-            <button onclick="handleAction()">Buy</button>
+            <button id="closeAlertBtn2">Close</button>
+            <button id="buyBtn">Buy</button>
         </div>
     </div>
 
