@@ -1,16 +1,17 @@
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Phone Maintenance & Recharge</title>
     <link rel="stylesheet" href="styles.css">
-    <script src="touch.js"></script>
+    <script src="touch.js" defer></script>
 </head>
 <body>
     <!--Header Part-->
     <header>
         <div class="logo">
-            <img alt="logo" src="img\logo.png" ></img>
+            <img alt="logo" src="img/logo.png">
             <h1>Phone Maintenance & Recharge</h1>
         </div>
         <div class="menu-toggle" id="menuToggle">☰</div>
@@ -20,38 +21,37 @@
             <a href="#services">Services</a>
             <a href="contact-us.html">Contact</a>
             <a href="homepage.html">
-              <img src="https://static.vecteezy.com/system/resources/previews/005/544/718/non_2x/profile-icon-design-free-vector.jpg" alt="User Icon" width="50" height="50">
+                <img src="https://static.vecteezy.com/system/resources/previews/005/544/718/non_2x/profile-icon-design-free-vector.jpg" alt="User Icon" width="50" height="50">
             </a>
-
         </nav>
     </header>
+
     <!--Main Part-->
     <div class="middle">
         <div class="section">
             <h2>TOUCH Card-7.58$</h2>
-            <a  onclick="openAlert()" class="background-image">
-                <img src="img/mtc-7.58$.jpg" class="background-image" />
+            <a onclick="openAlert()" class="background-image">
+                <img src="img/mtc-7.58$.jpg" alt="Touch Card Image" class="background-image" />
             </a>
         </div>
-        <!-- Custom Alert Box -->
-<div id="customAlert" class="alert-overlay">
-    <div class="alert-box">
-      <span class="close-btn" onclick="closeAlert()">&times;</span>
-      <h2>Touch Card-7.58$</h2>
-      <h3>Description</h3>
-        <p>
-        Card $7.58
-        Valid for 1 month — includes $7.58 in credits.
-        </p>
-        Price:800,000LBP
-        <br>
-      <button onclick="closeAlert()">Close</button>
-      <button onclick="handleAction()">buy</button>
     </div>
-  </div>
+
+    <!-- Custom Alert Box -->
+    <div id="customAlert" class="alert-overlay">
+        <div class="alert-box">
+            <span class="close-btn" onclick="closeAlert()">&times;</span>
+            <h2>Touch Card-7.58$</h2>
+            <h3>Description</h3>
+            <p>
+                Card $7.58<br>
+                Valid for 1 month — includes $7.58 in credits.<br>
+                Price: 800,000LBP
+            </p>
+            <button onclick="closeAlert()">Close</button>
+            <button onclick="handleAction()">Buy</button>
+        </div>
     </div>
-    
-   
+
     <!--Footer Part-->
     <footer class="footer">
         <div class="footer-container">
@@ -70,8 +70,8 @@
             </div>
             <div class="footer-section">
                 <h2>Contact Us</h2>
-                <p>Email:<a href="mailto:remahmattar@gmail.com">remahmattar@gmail.com</a></p>
-                <p>Phone:<a href="tel:+96171282169">+961-71282169</a></p>
+                <p>Email: <a href="mailto:remahmattar@gmail.com">remahmattar@gmail.com</a></p>
+                <p>Phone: <a href="tel:+96171282169">+961-71282169</a></p>
             </div>
             <div class="footer-section">
                 <h2>Follow Us</h2>
@@ -81,11 +81,9 @@
                 </ul>
             </div>
         </div>
-        
     </footer>
     <div class="footer-bottom">
         <p>&copy; Established in 2022. All rights reserved.</p>
     </div>
-    <script src="index.js"></script>
 </body>
 </html>
