@@ -81,33 +81,33 @@ async function checkBalance(userId) {
 
 
 
-    // Get an unused item code and mark it as selected
-    async function getOneAvailableItemCode() {
-        const itemsRef = collection(db, "items");
-        const q = query(itemsRef, where("selected", "==", false), limit(1));
+   // Get an unused item code and mark it as selected
+async function getOneAvailableItemCode() {
+    const itemsRef = collection(db, "items");
+    const q = query(itemsRef, where("selected", "==", false), limit(1));
 
-        try {
-            const querySnapshot = await getDocs(q);
+    try {
+        const querySnapshot = await getDocs(q);
 
-            if (!querySnapshot.empty) {
-                const itemDoc = querySnapshot.docs[0];
-                const itemId = itemDoc.id;
-                const itemData = itemDoc.data();
+        if (!querySnapshot.empty) {
+            const itemDoc = querySnapshot.docs[0];
+            const itemId = itemDoc.id;
+            const itemData = itemDoc.data();
 
-                 showItemCode(itemData["item-code"]);
-                 // Mark as selected
-                const itemRef = doc(db, "items", itemId);
-                await updateDoc(itemRef, { selected: true });
-                
-                
-            } else {
-                alert("Sold out. No more item codes available.");
-            }
-        } catch (error) {
-            alert("Error fetching item code: " + error.message);
+            const itemRef = doc(db, "items", itemId);
+            await updateDoc(itemRef, { selected: true });
+
+            // ✅ Now redirect AFTER it's marked as selected
+            showItemCode(itemData["item-code"]);
+
+        } else {
+            alert("Sold out. No more item codes available.");
         }
+    } catch (error) {
+        alert("Error fetching item code: " + error.message);
     }
-});
+}
+
 function showItemCode(code) {
     // Redirect to touch-buy.html with the code as a query parameter
     window.location.href = `touch-buy.html?code=${encodeURIComponent(code)}`;
