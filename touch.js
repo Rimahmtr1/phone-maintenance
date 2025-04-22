@@ -55,66 +55,65 @@ document.addEventListener("DOMContentLoaded", function () {
             alert("Please log in or sign up to continue.");
         }
     }
-async function checkBalance(userId) {
-    try {
-        const userRef = doc(db, "users", userId);
-        const userSnap = await getDoc(userRef);
 
-        if (!userSnap.exists()) return alert("User data not found.");
+    async function checkBalance(userId) {
+        try {
+            const userRef = doc(db, "users", userId);
+            const userSnap = await getDoc(userRef);
 
-        const userData = userSnap.data();
-        const balance = userData.balance || 0;
+            if (!userSnap.exists()) return alert("User data not found.");
 
-        if (balance < 800000) return alert("You don't have enough balance.");
+            const userData = userSnap.data();
+            const balance = userData.balance || 0;
 
-        const itemData = await getOneAvailableItemCode(userId); // 🔁 Pass userId
-        if (!itemData) return; // ⛔ Don't show anything if item was not assigned
+            if (balance < 800000) return alert("You don't have enough balance.");
 
-        // 👇 Update balance AFTER item was secured
-        const newBalance = balance - 800000;
-        await updateDoc(userRef, { balance: newBalance });
+            const itemData = await getOneAvailableItemCode(userId); // 🔁 Pass userId
+            if (!itemData) return; // ⛔ Don't show anything if item was not assigned
 
-        showItemCode(itemData["item-code"]);
+            // 👇 Update balance AFTER item was secured
+            const newBalance = balance - 800000;
+            await updateDoc(userRef, { balance: newBalance });
 
-    } catch (error) {
-        alert("Error checking balance: " + error.message);
+            showItemCode(itemData["item-code"]);
+
+        } catch (error) {
+            alert("Error checking balance: " + error.message);
+        }
     }
-}
-async function getOneAvailableItemCode(userId) {
-    const itemsRef = collection(db, "items");
-    const q = query(itemsRef, where("selected", "==", false), limit(1));
 
-    try {
-        const querySnapshot = await getDocs(q);
+    async function getOneAvailableItemCode(userId) {
+        const itemsRef = collection(db, "items");
+        const q = query(itemsRef, where("selected", "==", false), limit(1));
 
-        if (querySnapshot.empty) {
-            alert("Sold out. No more item codes available.");
+        try {
+            const querySnapshot = await getDocs(q);
+
+            if (querySnapshot.empty) {
+                alert("Sold out. No more item codes available.");
+                return null;
+            }
+
+            const itemDoc = querySnapshot.docs[0];
+            const itemId = itemDoc.id;
+            const itemData = itemDoc.data();
+
+            const itemRef = doc(db, "items", itemId);
+            await updateDoc(itemRef, {
+                selected: true,
+                selectedBy: userId // 🔥 this is required for rule to pass
+            });
+
+            return itemData;
+
+        } catch (error) {
+            alert("Error fetching item code: " + error.message);
             return null;
         }
-
-        const itemDoc = querySnapshot.docs[0];
-        const itemId = itemDoc.id;
-        const itemData = itemDoc.data();
-
-        const itemRef = doc(db, "items", itemId);
-        await updateDoc(itemRef, {
-            selected: true,
-            selectedBy: userId // 🔥 this is required for rule to pass
-        });
-
-        
-
-        return itemData;
-
-    } catch (error) {
-        alert("Error fetching item code: " + error.message);
-        return null;
     }
-}
 
-  
-
-// ✅ This function lives outside DOMContentLoaded
-function showItemCode(code) {
-    window.location.href = `touch-buy.html?code=${encodeURIComponent(code)}`;
-}
+    // ✅ This function lives outside DOMContentLoaded
+    function showItemCode(code) {
+        window.location.href = `touch-buy.html?code=${encodeURIComponent(code)}`;
+    }
+});
