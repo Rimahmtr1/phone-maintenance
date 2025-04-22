@@ -19,41 +19,50 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth();
 
-// Function to open the custom alert
-function openAlert() {
-    document.getElementById('customAlert').style.display = 'flex';
-}
-
-// Function to close the custom alert
-function closeAlert() {
-    document.getElementById('customAlert').style.display = 'none';
-}
-
-// Check if the user is logged in
-const userId = localStorage.getItem('loggedUserId');
-
-// Handle action after clicking "Buy"
-function handleAction() {
-    if (userId) {
-        checkBalance(); // Go to the balance check
-    } else {
-        alert("Please log in or sign up to continue.");
+document.addEventListener("DOMContentLoaded", function () {
+    // Function to open the custom alert
+    function openAlert() {
+        document.getElementById('customAlert').style.display = 'flex';
     }
-}
 
-// Placeholder for balance checking (implement as necessary)
-function checkBalance() {
-    alert("Checking balance... (user is logged in)");
-}
+    // Function to close the custom alert
+    function closeAlert() {
+        document.getElementById('customAlert').style.display = 'none';
+    }
 
-// Add the event listener when the page is loaded
-document.addEventListener("DOMContentLoaded", function() {
-    // Use a more specific selector and make sure it finds the element
-    const alertLink = document.querySelector('a[onclick="openAlert()"]');
-    
-    if (alertLink) {
-        alertLink.addEventListener('click', openAlert);
-    } else {
-        console.error("Element not found!");
+    // Check if the user is logged in
+    const userId = localStorage.getItem('loggedUserId');
+
+    // Handle action when "Buy" button is clicked
+    function handleAction() {
+        if (userId) {
+            checkBalance(); // Go to the balance check
+        } else {
+            alert("Please log in or sign up to continue.");
+        }
+    }
+
+    // Placeholder for balance checking (implement as necessary)
+    function checkBalance() {
+        alert("Checking balance... (user is logged in)");
+    }
+
+    // Attach event listeners after the DOM is loaded
+    const openAlertBtn = document.getElementById("openAlertBtn");
+    const closeAlertBtn = document.getElementById("closeAlertBtn");
+    const buyBtn = document.getElementById("buyBtn");
+
+    // Add event listeners to buttons
+    if (openAlertBtn) {
+        openAlertBtn.addEventListener("click", openAlert);
+    }
+
+    if (closeAlertBtn) {
+        closeAlertBtn.addEventListener("click", closeAlert);
+    }
+
+    if (buyBtn) {
+        buyBtn.addEventListener("click", handleAction);
     }
 });
+
