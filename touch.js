@@ -10,7 +10,8 @@ import {
     getDocs,
     updateDoc,
     doc,
-    getDoc
+    getDoc,
+    setDoc
 } from "https://www.gstatic.com/firebasejs/9.1.3/firebase-firestore.js";
 
 // Firebase Configuration
@@ -49,7 +50,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function handleAction() {
         // Display confirmation alert before proceeding with the purchase
-        const confirmed = confirm("Are you sure you want to buy this item?");
+        const confirmed = confirm("Are you sure you want to buy this item? 123");
         
         if (confirmed) {
             const userId = localStorage.getItem('loggedUserId');
@@ -81,6 +82,9 @@ document.addEventListener("DOMContentLoaded", function () {
             // 👇 Update balance AFTER item was secured
             const newBalance = balance - 800000;
             await updateDoc(userRef, { balance: newBalance });
+
+            // Save the transaction
+            await saveTransaction(userId, itemData["item-code"], 800000, 'purchase', balance, newBalance);
 
             showItemCode(itemData["item-code"]);
 
@@ -116,6 +120,28 @@ document.addEventListener("DOMContentLoaded", function () {
         } catch (error) {
             alert("Error fetching item code: " + error.message);
             return null;
+        }
+    }
+
+    // ✅ This function saves the transaction data
+    async function saveTransaction(userId, itemCode, amount, transactionType, balanceBefore, balanceAfter) {
+        const transactionRef = doc(collection(db, "transactions")); // Firestore auto-id
+
+        const transactionData = {
+            transactionid: userId,
+            secretcode: itemCode,
+            transaction_date: new Date().toISOString(), // Current date and time
+            amount: amount,
+            transaction_type: transactionType,
+            balance_before: balanceBefore,
+            balance_after: balanceAfter
+        };
+
+        try {
+            await setDoc(transactionRef, transactionData);
+            console.log("Transaction saved successfully!");
+        } catch (error) {
+            alert("Error saving transaction: " + error.message);
         }
     }
 
