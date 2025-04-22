@@ -1,6 +1,6 @@
-// Ensure Firebase functions are loaded as modules
+// Firebase Modules
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.1.3/firebase-app.js";
-import { getAuth, signOut } from "https://www.gstatic.com/firebasejs/9.1.3/firebase-auth.js";
+import { getAuth } from "https://www.gstatic.com/firebasejs/9.1.3/firebase-auth.js";
 import {
     getFirestore,
     collection,
@@ -9,9 +9,11 @@ import {
     limit,
     getDocs,
     updateDoc,
-    doc
+    doc,
+    getDoc
 } from "https://www.gstatic.com/firebasejs/9.1.3/firebase-firestore.js";
-// Firebase configuration
+
+// Firebase Configuration
 const firebaseConfig = {
     apiKey: "AIzaSyCJsJsuMx1LT6SXZcCqdHa5wkueqXTTT4Q",
     authDomain: "phone-maintenance-18b38.firebaseapp.com",
@@ -28,90 +30,81 @@ const db = getFirestore(app);
 const auth = getAuth();
 
 document.addEventListener("DOMContentLoaded", function () {
-    // Function to open the custom alert
+    // UI functions
     function openAlert() {
         document.getElementById('customAlert').style.display = 'flex';
     }
 
-    // Function to close the custom alert
     function closeAlert() {
         document.getElementById('customAlert').style.display = 'none';
     }
 
-    // Check if the user is logged in
-    const userId = localStorage.getItem('loggedUserId');
-
-    // Handle action when "Buy" button is clicked
-    function handleAction() {
-        if (userId) {
-            checkBalance(); // Go to the balance check
-        } else {
-            alert("Please log in or sign up to continue.");
-        }
-    }
-     const userRef = doc(db, "users", userId);
- try {
-        const userSnap = await getDoc(userRef);
-
-        if (userSnap.exists()) {
-            const userData = userSnap.data();
-            const balance = userData.balance || 0;
-
-            if (balance >= 800000) {
-                getOneAvailableItemCode();
-            } else {
-                alert("You don't have enough balance.");
-            }
-        } else {
-            alert("User data not found.");
-        }
-    } catch (error) {
-        alert("Error checking balance: " + error.message);
-    }
-}
-
-async function getOneAvailableItemCode() {
-    const itemsRef = collection(db, "items");
-    const q = query(itemsRef, where("selected", "==", false), limit(1));
-
-    try {
-        const querySnapshot = await getDocs(q);
-
-        if (!querySnapshot.empty) {
-            const itemDoc = querySnapshot.docs[0];
-            const itemId = itemDoc.id;
-            const itemData = itemDoc.data();
-
-            // Display the item-code to the user
-            alert("Your item code is: " + itemData["item-code"]);
-
-            // Mark it as selected
-            const itemRef = doc(db, "items", itemId);
-            await updateDoc(itemRef, { selected: true });
-        } else {
-            alert("Sold out. No more item codes available.");
-        }
-    } catch (error) {
-        alert("Error fetching item code: " + error.message);
-    }
-}
-
-    // Attach event listeners after the DOM is loaded
+    // Button event listener setup
     const openAlertBtn = document.getElementById("openAlertBtn");
     const closeAlertBtn = document.getElementById("closeAlertBtn");
     const buyBtn = document.getElementById("buyBtn");
 
-    // Add event listeners to buttons
-    if (openAlertBtn) {
-        openAlertBtn.addEventListener("click", openAlert);
+    if (openAlertBtn) openAlertBtn.addEventListener("click", openAlert);
+    if (closeAlertBtn) closeAlertBtn.addEventListener("click", closeAlert);
+    if (buyBtn) buyBtn.addEventListener("click", handleAction);
+
+    // Main buy button action
+    function handleAction() {
+        const userId = localStorage.getItem('loggedUserId');
+        if (userId) {
+            checkBalance(userId);
+        } else {
+            alert("Please log in or sign up to continue.");
+        }
     }
 
-    if (closeAlertBtn) {
-        closeAlertBtn.addEventListener("click", closeAlert);
+    // Check balance and proceed if sufficient
+    async function checkBalance(userId) {
+        try {
+            const userRef = doc(db, "users", userId);
+            const userSnap = await getDoc(userRef);
+
+            if (userSnap.exists()) {
+                const userData = userSnap.data();
+                const balance = userData.balance || 0;
+
+                if (balance >= 800000) {
+                    await getOneAvailableItemCode();
+                } else {
+                    alert("You don't have enough balance.");
+                }
+            } else {
+                alert("User data not found.");
+            }
+        } catch (error) {
+            alert("Error checking balance: " + error.message);
+        }
     }
 
-    if (buyBtn) {
-        buyBtn.addEventListener("click", handleAction);
+    // Get an unused item code and mark it as selected
+    async function getOneAvailableItemCode() {
+        const itemsRef = collection(db, "items");
+        const q = query(itemsRef, where("selected", "==", false), limit(1));
+
+        try {
+            const querySnapshot = await getDocs(q);
+
+            if (!querySnapshot.empty) {
+                const itemDoc = querySnapshot.docs[0];
+                const itemId = itemDoc.id;
+                const itemData = itemDoc.data();
+
+                // Show code to user
+                alert("Your item code is: " + itemData["item-code"]);
+
+                // Mark as selected
+                const itemRef = doc(db, "items", itemId);
+                await updateDoc(itemRef, { selected: true });
+            } else {
+                alert("Sold out. No more item codes available.");
+            }
+        } catch (error) {
+            alert("Error fetching item code: " + error.message);
+        }
     }
 });
-
