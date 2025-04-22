@@ -49,15 +49,24 @@ document.addEventListener("DOMContentLoaded", function () {
             alert("Please log in or sign up to continue.");
         }
     }
+     const userRef = doc(db, "users", userId);
+ try {
+        const userSnap = await getDoc(userRef);
 
-    // Simulated user balance (replace this with real data from Firestore or your backend)
-async function checkBalance() {
-    const balance = userData.balance || 0; // Example value, replace this with real balance logic
+        if (userSnap.exists()) {
+            const userData = userSnap.data();
+            const balance = userData.balance || 0;
 
-    if (balance >= 800000) {
-        getOneAvailableItemCode();
-    } else {
-        alert("You don't have enough balance.");
+            if (balance >= 800000) {
+                getOneAvailableItemCode();
+            } else {
+                alert("You don't have enough balance.");
+            }
+        } else {
+            alert("User data not found.");
+        }
+    } catch (error) {
+        alert("Error checking balance: " + error.message);
     }
 }
 
