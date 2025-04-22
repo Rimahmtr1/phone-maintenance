@@ -10,8 +10,7 @@ import {
     getDocs,
     updateDoc,
     doc,
-    getDoc,
-    addDoc
+    getDoc
 } from "https://www.gstatic.com/firebasejs/9.1.3/firebase-firestore.js";
 
 // Firebase Configuration
@@ -30,23 +29,23 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth();
 
-document.addEventListener("DOMContentLoaded", function () {
-    function openAlert() {
-        document.getElementById('customAlert').style.display = 'flex';
-    }
-
-    function closeAlert() {
-        document.getElementById('customAlert').style.display = 'none';
-    }
-
+// DOM ready
+document.addEventListener("DOMContentLoaded", () => {
     const openAlertBtn = document.getElementById("openAlertBtn");
     const closeAlertBtn = document.getElementById("closeAlertBtn");
     const buyBtn = document.getElementById("buyBtn");
 
-    if (openAlertBtn) openAlertBtn.addEventListener("click", openAlert);
-    if (closeAlertBtn) closeAlertBtn.addEventListener("click", closeAlert);
-    if (buyBtn) buyBtn.addEventListener("click", () => {
-        closeAlert(); // Hide modal first
+    // UI handlers
+    openAlertBtn?.addEventListener("click", () => {
+        document.getElementById('customAlert').style.display = 'flex';
+    });
+
+    closeAlertBtn?.addEventListener("click", () => {
+        document.getElementById('customAlert').style.display = 'none';
+    });
+
+    buyBtn?.addEventListener("click", () => {
+        document.getElementById('customAlert').style.display = 'none';
         const userId = localStorage.getItem('loggedUserId');
         if (userId) {
             checkBalance(userId);
@@ -54,89 +53,72 @@ document.addEventListener("DOMContentLoaded", function () {
             alert("Please log in or sign up to continue.");
         }
     });
+});
 
-    async function checkBalance(userId) {
-        try {
-            const userRef = doc(db, "users", userId);
-            const userSnap = await getDoc(userRef);
+// Check balance and process purchase
+async function checkBalance(userId) {
+    try {
+        const userRef = doc(db, "users", userId);
+        const userSnap = await getDoc(userRef);
 
-            if (!userSnap.exists()) return alert("User data not found.");
-
-            const userData = userSnap.data();
-            const balance = userData.balance || 0;
-
-            if (balance < 800000) return alert("You don't have enough balance.");
-
-            const itemData = await getOneAvailableItemCode(userId);
-            if (!itemData) return;
-
-            const itemCode = itemData["item-code"];
-
-            const newBalance = balance - 800000;
-            await updateDoc(userRef, { balance: newBalance });
-
-            await logTransaction(userId, itemCode);
-
-            showItemCode(itemCode);
-
-        } catch (error) {
-            alert("Error checking balance: " + error.message);
+        if (!userSnap.exists()) {
+            alert("User data not found.");
+            return;
         }
+
+        const { balance = 0 } = userSnap.data();
+
+        if (balance < 800000) {
+            alert("You don't have enough balance.");
+            return;
+        }
+
+        const itemData = await getOneAvailableItemCode(userId);
+        if (!itemData) return;
+
+        const newBalance = balance - 800000;
+        await updateDoc(userRef, { balance: newBalance });
+
+        showItemCode(itemData["item-code"]);
+
+    } catch (error) {
+        alert("Error checking balance: " + error.message);
     }
+}
 
-    async function getOneAvailableItemCode(userId) {
-        const itemsRef = collection(db, "items");
-        const q = query(itemsRef, where("selected", "==", false), limit(1));
+// Get one available item
+async function getOneAvailableItemCode(userId) {
+    try {
+        const q = query(
+            collection(db, "items"),
+            where("selected", "==", false),
+            limit(1)
+        );
 
-        try {
-            const querySnapshot = await getDocs(q);
+        const snapshot = await getDocs(q);
 
-            if (querySnapshot.empty) {
-                alert("Sold out. No more item codes available.");
-                return null;
-            }
-
-            const itemDoc = querySnapshot.docs[0];
-            const itemId = itemDoc.id;
-            const itemData = itemDoc.data();
-
-            const itemRef = doc(db, "items", itemId);
-            await updateDoc(itemRef, {
-                selected: true,
-                selectedBy: userId
-            });
-
-            return itemData;
-
-        } catch (error) {
-            alert("Error fetching item code: " + error.message);
+        if (snapshot.empty) {
+            alert("Sold out. No more item codes available.");
             return null;
         }
-    }
 
-    async function logTransaction(userId, itemCode) {
-        try {
-            const transactionsRef = collection(db, "transactions");
-            const transactionData = {
-                date: new Date().toISOString(),
-                transactionid: generateTransactionId(),
-                type: "item-purchase",
-                itemcode: itemCode
-            };
-            await addDoc(transactionsRef, transactionData);
-            console.log("Transaction logged:", transactionData);
-        } catch (error) {
-            console.error("Failed to log transaction:", error.message);
-        }
-    }
+        const itemDoc = snapshot.docs[0];
+        const itemRef = doc(db, "items", itemDoc.id);
 
-    function generateTransactionId() {
-        const randomPart = Math.random().toString(36).substring(2, 8).toUpperCase();
-        const datePart = new Date().toISOString().slice(0, 10).replace(/-/g, "");
-        return `TX-${datePart}-${randomPart}`;
-    }
+        await updateDoc(itemRef, {
+            selected: true,
+            selectedBy: userId
+        });
 
-    function showItemCode(code) {
-        window.location.href = `touch-buy.html?code=${encodeURIComponent(code)}`;
+        return itemDoc.data();
+
+    } catch (error) {
+        alert("Error fetching item code: " + error.message);
+        return null;
     }
-});
+}
+
+// Redirect with item code
+function showItemCode(code) {
+    window.location.href = `touch-buy.html?code=${encodeURIComponent(code)}`;
+}
