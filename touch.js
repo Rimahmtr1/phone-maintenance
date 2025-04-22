@@ -1,6 +1,4 @@
-// Firebase Modules
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.1.3/firebase-app.js";
-import { getAuth } from "https://www.gstatic.com/firebasejs/9.1.3/firebase-auth.js";
 import {
     getFirestore,
     collection,
@@ -12,8 +10,9 @@ import {
     doc,
     getDoc
 } from "https://www.gstatic.com/firebasejs/9.1.3/firebase-firestore.js";
+import { getAuth } from "https://www.gstatic.com/firebasejs/9.1.3/firebase-auth.js";
 
-// Firebase Configuration
+// Firebase config
 const firebaseConfig = {
     apiKey: "AIzaSyCJsJsuMx1LT6SXZcCqdHa5wkueqXTTT4Q",
     authDomain: "phone-maintenance-18b38.firebaseapp.com",
@@ -24,86 +23,79 @@ const firebaseConfig = {
     measurementId: "G-0MD0GJJ0E2"
 };
 
-// Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth();
 
-document.addEventListener("DOMContentLoaded", function () {
-    // UI functions
-    function openAlert() {
-        document.getElementById('customAlert').style.display = 'flex';
-    }
-
-    function closeAlert() {
-        document.getElementById('customAlert').style.display = 'none';
-    }
-
-    const openAlertBtn = document.getElementById("openAlertBtn");
-    const closeAlertBtn = document.getElementById("closeAlertBtn");
+document.addEventListener("DOMContentLoaded", () => {
     const buyBtn = document.getElementById("buyBtn");
 
-    if (openAlertBtn) openAlertBtn.addEventListener("click", openAlert);
-    if (closeAlertBtn) closeAlertBtn.addEventListener("click", closeAlert);
-    if (buyBtn) buyBtn.addEventListener("click", handleAction);
-
-    function handleAction() {
+    buyBtn.addEventListener("click", async () => {
         const userId = localStorage.getItem('loggedUserId');
-        if (userId) {
-            checkBalance(userId);
+        if (!userId) {
+            alert("Please log in first.");
+            return;
+        }
+        await checkBalance(userId);
+    });
+});
+
+// Fetch balance and determine eligibility
+async function checkBalance(userId) {
+    try {
+        const userRef = doc(db, "users", userId);
+        const userSnap = await getDoc(userRef);
+
+        if (userSnap.exists()) {
+            const userData = userSnap.data();
+            const balance = userData.balance || 0;
+
+            if (balance >= 800000) {
+                await getOneAvailableItemCode();
+            } else {
+                alert("You don't have enough balance.");
+            }
         } else {
-            alert("Please log in or sign up to continue.");
+            alert("User not found.");
         }
+    } catch (error) {
+        alert("Error checking balance: " + error.message);
     }
+}
 
-    async function checkBalance(userId) {
-        try {
-            const userRef = doc(db, "users", userId);
-            const userSnap = await getDoc(userRef);
+// Fetch available item and mark it as selected
+async function getOneAvailableItemCode() {
+    const itemsRef = collection(db, "items");
+    const q = query(itemsRef, where("selected", "==", false), limit(1));
 
-            if (userSnap.exists()) {
-                const userData = userSnap.data();
-                const balance = userData.balance || 0;
+    try {
+        const querySnapshot = await getDocs(q);
 
-                if (balance >= 800000) {
-                    await getOneAvailableItemCode();
-                } else {
-                    alert("You don't have enough balance.");
-                }
-            } else {
-                alert("User data not found.");
-            }
-        } catch (error) {
-            alert("Error checking balance: " + error.message);
+        if (!querySnapshot.empty) {
+            const itemDoc = querySnapshot.docs[0];
+            const itemId = itemDoc.id;
+            const itemData = itemDoc.data();
+
+            // Mark the item as selected
+            const itemRef = doc(db, "items", itemId);
+            await updateDoc(itemRef, { selected: true });
+
+            // Show the item code in the styled box
+            showItemCode(itemData["item-code"]);
+        } else {
+            alert("Sold out. No more item codes.");
         }
+    } catch (error) {
+        alert("Error fetching item: " + error.message);
     }
+}
 
-    async function getOneAvailableItemCode() {
-        const itemsRef = collection(db, "items");
-        const q = query(itemsRef, where("selected", "==", false), limit(1));
-
-        try {
-            const querySnapshot = await getDocs(q);
-
-            if (!querySnapshot.empty) {
-                const itemDoc = querySnapshot.docs[0];
-                const itemId = itemDoc.id;
-                const itemData = itemDoc.data();
-
-                const itemRef = doc(db, "items", itemId);
-                await updateDoc(itemRef, { selected: true });
-
-                showItemCode(itemData["item-code"]);
-            } else {
-                alert("Sold out. No more item codes available.");
-            }
-        } catch (error) {
-            alert("Error fetching item code: " + error.message);
-        }
-    }
-}); // ✅ closes DOMContentLoaded
-
-// ✅ This function lives outside DOMContentLoaded
+// Display the item code in custom box
 function showItemCode(code) {
-    window.location.href = `touch-buy.html?code=${encodeURIComponent(code)}`;
+    document.getElementById("itemCodeText").textContent = code;
+    document.getElementById("itemCodeBox").style.display = "block";
+}
+
+function closeItemCodeBox() {
+    document.getElementById("itemCodeBox").style.display = "none";
 }
