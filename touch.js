@@ -103,7 +103,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 }); // ✅ closes DOMContentLoaded
 
-// ✅ Keep this outside DOMContentLoaded
+// ✅ This function lives outside DOMContentLoaded
 function showItemCode(code) {
     window.location.href = `touch-buy.html?code=${encodeURIComponent(code)}`;
 }
