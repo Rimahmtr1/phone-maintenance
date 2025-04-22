@@ -31,52 +31,25 @@ const db = getFirestore(app);
 const auth = getAuth();
 
 document.addEventListener("DOMContentLoaded", function () {
-    // UI functions
     const openAlertBtn = document.getElementById("openAlertBtn");
     const closeAlertBtn = document.getElementById("closeAlertBtn");
     const buyBtn = document.getElementById("buyBtn");
 
     // Open confirmation alert before buying
-    if (openAlertBtn) openAlertBtn.addEventListener("click", async function () {
-        const confirmBuy = confirm("Are you sure you want to buy?"); // Ask for confirmation
-        if (!confirmBuy) return; // Exit if user cancels
+    if (openAlertBtn) {
+        openAlertBtn.addEventListener("click", async function () {
+            // Ask for user confirmation before proceeding
+            const confirmBuy = confirm("Are you sure you want to buy?");
+            if (!confirmBuy) return; // Exit if user cancels
 
-        // Proceed with the purchase if confirmed
-        const userId = localStorage.getItem('loggedUserId');
-        if (!userId) return alert("Please log in or sign up to continue.");
+            // Proceed with the purchase if confirmed
+            const userId = localStorage.getItem('loggedUserId');
+            if (!userId) return alert("Please log in or sign up to continue.");
 
-        const userRef = doc(db, "users", userId);
-        const userSnap = await getDoc(userRef);
-
-        if (!userSnap.exists()) return alert("User data not found.");
-        const userData = userSnap.data();
-        const balance = userData.balance || 0;
-
-        if (balance < 800000) return alert("You don't have enough balance.");
-
-        const itemData = await getOneAvailableItemCode(userId);
-        if (!itemData) return;
-
-        const newBalance = balance - 800000;
-        await updateDoc(userRef, { balance: newBalance });
-
-        // Step 3: Create the transaction before redirect
-        await createTransaction(itemData["item-code"], 800000); // Pass item code and amount
-
-        // Step 4: Go to the item page
-        showItemCode(itemData["item-code"]);
-    });
-
-    if (closeAlertBtn) closeAlertBtn.addEventListener("click", closeAlert);
-
-    // Check balance and proceed if valid
-    async function checkBalance(userId) {
-        try {
             const userRef = doc(db, "users", userId);
             const userSnap = await getDoc(userRef);
 
             if (!userSnap.exists()) return alert("User data not found.");
-
             const userData = userSnap.data();
             const balance = userData.balance || 0;
 
@@ -88,14 +61,17 @@ document.addEventListener("DOMContentLoaded", function () {
             const newBalance = balance - 800000;
             await updateDoc(userRef, { balance: newBalance });
 
-            showItemCode(itemData["item-code"]);
+            // Create the transaction before redirecting
+            await createTransaction(itemData["item-code"], 800000); // Pass item code and amount
 
-        } catch (error) {
-            alert("Error checking balance: " + error.message);
-        }
+            // Proceed to show item code on the next page
+            showItemCode(itemData["item-code"]);
+        });
     }
 
-    // Get available item code
+    if (closeAlertBtn) closeAlertBtn.addEventListener("click", closeAlert);
+
+    // Function to get available item code
     async function getOneAvailableItemCode(userId) {
         const itemsRef = collection(db, "items");
         const q = query(itemsRef, where("selected", "==", false), limit(1));
@@ -112,26 +88,26 @@ document.addEventListener("DOMContentLoaded", function () {
             const itemId = itemDoc.id;
             const itemData = itemDoc.data();
 
+            // Update the selected item as taken
             const itemRef = doc(db, "items", itemId);
             await updateDoc(itemRef, {
                 selected: true,
-                selectedBy: userId // 🔥 this is required for rule to pass
+                selectedBy: userId // Assign item to the user
             });
 
             return itemData;
-
         } catch (error) {
             alert("Error fetching item code: " + error.message);
             return null;
         }
     }
 
-    // Create transaction document in Firestore
+    // Function to create a transaction document in Firestore
     async function createTransaction(itemCode, amount) {
         try {
             const transactionsRef = collection(db, "transactions");
 
-            // Create transaction data
+            // Prepare transaction data
             const transactionData = {
                 date: new Date().toISOString(), // Current timestamp
                 itemcode: itemCode,             // Item code
@@ -142,9 +118,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
             // Add the transaction to Firestore
             const docRef = await addDoc(transactionsRef, transactionData);
+
             console.log("Transaction created successfully with ID:", docRef.id);
 
-            // Optionally, you can update the document with the transaction ID if required
+            // Optionally, you can update the document with the transaction ID
             await updateDoc(docRef, {
                 "transaction-id": docRef.id
             });
@@ -155,7 +132,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
-    // Show the item code on the next page
+    // Function to show item code on the next page
     function showItemCode(code) {
         window.location.href = `touch-buy.html?code=${encodeURIComponent(code)}`;
     }
