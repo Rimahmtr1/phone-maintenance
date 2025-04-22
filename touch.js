@@ -52,7 +52,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Simulated user balance (replace this with real data from Firestore or your backend)
 async function checkBalance() {
-    const balance = 850000; // Example value, replace this with real balance logic
+    const balance = userData.balance || 0; // Example value, replace this with real balance logic
 
     if (balance >= 800000) {
         getOneAvailableItemCode();
