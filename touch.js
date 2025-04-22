@@ -69,7 +69,13 @@ document.addEventListener("DOMContentLoaded", function () {
                 if (balance >= 800000) {
                     // Deduct 800,000 from balance
                     const newBalance = balance - 800000;
-                    
+                     try {
+                        await updateDoc(userRef, { balance: newBalance });
+                        console.log("Balance updated successfully");
+                    } catch (error) {
+                        console.error("Error updating balance:", error);
+                        alert("Error updating balance: " + error.message);
+                    }
 
                     await getOneAvailableItemCode();
                 } else {
@@ -97,13 +103,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
                 const itemRef = doc(db, "items", itemId);
                 await updateDoc(itemRef, { selected: true });
-                try {
-                        await updateDoc(userRef, { balance: newBalance });
-                        console.log("Balance updated successfully");
-                    } catch (error) {
-                        console.error("Error updating balance:", error);
-                        alert("Error updating balance: " + error.message);
-                    }
+               
                 showItemCode(itemData["item-code"]);
             } else {
                 alert("Sold out. No more item codes available.");
