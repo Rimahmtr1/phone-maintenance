@@ -58,28 +58,28 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
-    // Check balance and proceed if sufficient
     async function checkBalance(userId) {
-        try {
-            const userRef = doc(db, "users", userId);
-            const userSnap = await getDoc(userRef);
+    try {
+        const userRef = doc(db, "users", userId);
+        const userSnap = await getDoc(userRef);
 
-            if (userSnap.exists()) {
-                const userData = userSnap.data();
-                const balance = userData.balance || 0;
+        if (userSnap.exists()) {
+            const userData = userSnap.data(); // ✅ define inside this block
+            const balance = userData.balance || 0;
 
-                if (balance >= 800000) {
-                    await getOneAvailableItemCode();
-                } else {
-                    alert("You don't have enough balance.");
-                }
+            if (balance >= 800000) {
+                await getOneAvailableItemCode(); // ✅ wait for it
             } else {
-                alert("User data not found.");
+                alert("You don't have enough balance.");
             }
-        } catch (error) {
-            alert("Error checking balance: " + error.message);
+        } else {
+            alert("User data not found.");
         }
+    } catch (error) {
+        alert("Error checking balance: " + error.message);
     }
+}
+
 
     // Get an unused item code and mark it as selected
     async function getOneAvailableItemCode() {
