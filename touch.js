@@ -10,7 +10,8 @@ import {
     getDocs,
     updateDoc,
     doc,
-    getDoc
+    getDoc,
+    addDoc
 } from "https://www.gstatic.com/firebasejs/9.1.3/firebase-firestore.js";
 
 // Firebase Configuration
@@ -31,22 +32,44 @@ const auth = getAuth();
 
 document.addEventListener("DOMContentLoaded", function () {
     // UI functions
-    function openAlert() {
-        document.getElementById('customAlert').style.display = 'flex';
-    }
-
-    function closeAlert() {
-        document.getElementById('customAlert').style.display = 'none';
-    }
-
     const openAlertBtn = document.getElementById("openAlertBtn");
     const closeAlertBtn = document.getElementById("closeAlertBtn");
     const buyBtn = document.getElementById("buyBtn");
 
-    if (openAlertBtn) openAlertBtn.addEventListener("click", openAlert);
-    if (closeAlertBtn) closeAlertBtn.addEventListener("click", closeAlert);
-    if (buyBtn) buyBtn.addEventListener("click", handleAction);
+    if (openAlertBtn) openAlertBtn.addEventListener("click", async function () {
+        // Step 1: Confirm the buy action
+        const confirmBuy = confirm("Are you sure you want to buy?");
+        if (!confirmBuy) return; // Exit if user cancels
 
+        // Step 2: Proceed with the purchase if confirmed
+        const userId = localStorage.getItem('loggedUserId');
+        if (!userId) return alert("Please log in or sign up to continue.");
+
+        const userRef = doc(db, "users", userId);
+        const userSnap = await getDoc(userRef);
+
+        if (!userSnap.exists()) return alert("User data not found.");
+        const userData = userSnap.data();
+        const balance = userData.balance || 0;
+
+        if (balance < 800000) return alert("You don't have enough balance.");
+
+        const itemData = await getOneAvailableItemCode(userId);
+        if (!itemData) return;
+
+        const newBalance = balance - 800000;
+        await updateDoc(userRef, { balance: newBalance });
+
+        // Step 3: Create the transaction before redirect
+        await createTransaction(itemData["item-code"]);
+
+        // Step 4: Go to the item page
+        showItemCode(itemData["item-code"]);
+    });
+
+    if (closeAlertBtn) closeAlertBtn.addEventListener("click", closeAlert);
+
+    // Handle the action on buy
     function handleAction() {
         const userId = localStorage.getItem('loggedUserId');
         if (userId) {
@@ -68,10 +91,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
             if (balance < 800000) return alert("You don't have enough balance.");
 
-            const itemData = await getOneAvailableItemCode(userId); // 🔁 Pass userId
-            if (!itemData) return; // ⛔ Don't show anything if item was not assigned
+            const itemData = await getOneAvailableItemCode(userId);
+            if (!itemData) return;
 
-            // 👇 Update balance AFTER item was secured
             const newBalance = balance - 800000;
             await updateDoc(userRef, { balance: newBalance });
 
@@ -112,9 +134,38 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
-    // ✅ This function lives outside DOMContentLoaded
+    // Create transaction document in Firestore
+    async function createTransaction(itemCode) {
+        try {
+            const transactionsRef = collection(db, "transactions");
+
+            const transactionData = {
+                date: new Date().toISOString(),
+                itemcode: itemCode,
+                amount: 800000,
+                type: "buy",
+                status: "Success"
+            };
+
+            const docRef = await addDoc(transactionsRef, transactionData);
+            await updateDoc(docRef, {
+                "transaction-id": docRef.id
+            });
+
+            console.log("Transaction created:", docRef.id);
+        } catch (error) {
+            alert("Error creating transaction: " + error.message);
+        }
+    }
+
+    // This function will show the item code on the next page
     function showItemCode(code) {
         window.location.href = `touch-buy.html?code=${encodeURIComponent(code)}`;
+    }
+
+    // Close alert
+    function closeAlert() {
+        document.getElementById('customAlert').style.display = 'none';
     }
 
 }); // Closes DOMContentLoaded
