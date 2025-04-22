@@ -57,8 +57,7 @@ document.addEventListener("DOMContentLoaded", function () {
             alert("Please log in or sign up to continue.");
         }
     }
-
-    async function checkBalance(userId) {
+async function checkBalance(userId) {
     try {
         const userRef = doc(db, "users", userId);
         const userSnap = await getDoc(userRef);
@@ -79,6 +78,7 @@ document.addEventListener("DOMContentLoaded", function () {
         alert("Error checking balance: " + error.message);
     }
 }
+
 
 
     // Get an unused item code and mark it as selected
