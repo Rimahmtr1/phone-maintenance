@@ -36,12 +36,12 @@ document.addEventListener("DOMContentLoaded", function () {
     const closeAlertBtn = document.getElementById("closeAlertBtn");
     const buyBtn = document.getElementById("buyBtn");
 
+    // Open confirmation alert before buying
     if (openAlertBtn) openAlertBtn.addEventListener("click", async function () {
-        // Step 1: Confirm the buy action
-        const confirmBuy = confirm("Are you sure you want to buy?");
+        const confirmBuy = confirm("Are you sure you want to buy?"); // Ask for confirmation
         if (!confirmBuy) return; // Exit if user cancels
 
-        // Step 2: Proceed with the purchase if confirmed
+        // Proceed with the purchase if confirmed
         const userId = localStorage.getItem('loggedUserId');
         if (!userId) return alert("Please log in or sign up to continue.");
 
@@ -69,16 +69,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     if (closeAlertBtn) closeAlertBtn.addEventListener("click", closeAlert);
 
-    // Handle the action on buy
-    function handleAction() {
-        const userId = localStorage.getItem('loggedUserId');
-        if (userId) {
-            checkBalance(userId);
-        } else {
-            alert("Please log in or sign up to continue.");
-        }
-    }
-
+    // Check balance and proceed if valid
     async function checkBalance(userId) {
         try {
             const userRef = doc(db, "users", userId);
@@ -104,6 +95,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
+    // Get available item code
     async function getOneAvailableItemCode(userId) {
         const itemsRef = collection(db, "items");
         const q = query(itemsRef, where("selected", "==", false), limit(1));
@@ -139,7 +131,7 @@ document.addEventListener("DOMContentLoaded", function () {
         try {
             const transactionsRef = collection(db, "transactions");
 
-            // Creating the transaction data object
+            // Create transaction data
             const transactionData = {
                 date: new Date().toISOString(), // Current timestamp
                 itemcode: itemCode,             // Item code
@@ -152,8 +144,7 @@ document.addEventListener("DOMContentLoaded", function () {
             const docRef = await addDoc(transactionsRef, transactionData);
             console.log("Transaction created successfully with ID:", docRef.id);
 
-            // Optionally, if you want to add transaction-id to the created document, 
-            // you can update the document after creation as shown below
+            // Optionally, you can update the document with the transaction ID if required
             await updateDoc(docRef, {
                 "transaction-id": docRef.id
             });
@@ -164,7 +155,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
-    // This function will show the item code on the next page
+    // Show the item code on the next page
     function showItemCode(code) {
         window.location.href = `touch-buy.html?code=${encodeURIComponent(code)}`;
     }
