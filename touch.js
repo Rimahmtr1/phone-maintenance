@@ -61,7 +61,7 @@ document.addEventListener("DOMContentLoaded", function () {
         await updateDoc(userRef, { balance: newBalance });
 
         // Step 3: Create the transaction before redirect
-        await createTransaction(itemData["item-code"]);
+        await createTransaction(itemData["item-code"], 800000); // Pass item code and amount
 
         // Step 4: Go to the item page
         showItemCode(itemData["item-code"]);
@@ -135,25 +135,31 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     // Create transaction document in Firestore
-    async function createTransaction(itemCode) {
+    async function createTransaction(itemCode, amount) {
         try {
             const transactionsRef = collection(db, "transactions");
 
+            // Creating the transaction data object
             const transactionData = {
-                date: new Date().toISOString(),
-                itemcode: itemCode,
-                amount: 800000,
-                type: "buy",
-                status: "Success"
+                date: new Date().toISOString(), // Current timestamp
+                itemcode: itemCode,             // Item code
+                amount: amount,                 // Amount spent (800000)
+                type: "buy",                    // Transaction type
+                status: "Success"               // Transaction status
             };
 
+            // Add the transaction to Firestore
             const docRef = await addDoc(transactionsRef, transactionData);
+            console.log("Transaction created successfully with ID:", docRef.id);
+
+            // Optionally, if you want to add transaction-id to the created document, 
+            // you can update the document after creation as shown below
             await updateDoc(docRef, {
                 "transaction-id": docRef.id
             });
 
-            console.log("Transaction created:", docRef.id);
         } catch (error) {
+            console.error("Error creating transaction: ", error.message);
             alert("Error creating transaction: " + error.message);
         }
     }
