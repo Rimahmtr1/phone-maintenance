@@ -58,6 +58,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     async function checkBalance(userId) {
         try {
+            
             const userRef = doc(db, "users", userId);
             const userSnap = await getDoc(userRef);
 
@@ -68,7 +69,14 @@ document.addEventListener("DOMContentLoaded", function () {
                 if (balance >= 800000) {
                     // Deduct 800,000 from balance
                     const newBalance = balance - 800000;
-                    await updateDoc(userRef, { balance: newBalance });
+                    try {
+                        await updateDoc(userRef, { balance: newBalance });
+                        console.log("Balance updated successfully");
+                    } catch (error) {
+                        console.error("Error updating balance:", error);
+                        alert("Error updating balance: " + error.message);
+                    }
+
                     await getOneAvailableItemCode();
                 } else {
                     alert("You don't have enough balance.");
