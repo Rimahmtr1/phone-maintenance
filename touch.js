@@ -109,6 +109,7 @@ async function checkBalance(userId) {
     }
 });
 function showItemCode(code) {
-    document.getElementById("itemCodeText").textContent = code;
-    document.getElementById("itemCodeBox").style.display = "block";
+    // Redirect to touch-buy.html with the code as a query parameter
+    window.location.href = `touch-buy.html?code=${encodeURIComponent(code)}`;
 }
+
