@@ -94,12 +94,11 @@ async function checkBalance(userId) {
                 const itemId = itemDoc.id;
                 const itemData = itemDoc.data();
 
-                // Show code to user
-                alert("Your item code is: " + itemData["item-code"]);
-
-                // Mark as selected
+                 // Mark as selected
                 const itemRef = doc(db, "items", itemId);
                 await updateDoc(itemRef, { selected: true });
+                 showItemCode(itemData["item-code"]);
+                
             } else {
                 alert("Sold out. No more item codes available.");
             }
@@ -108,3 +107,7 @@ async function checkBalance(userId) {
         }
     }
 });
+function showItemCode(code) {
+    document.getElementById("itemCodeText").textContent = code;
+    document.getElementById("itemCodeBox").style.display = "block";
+}
