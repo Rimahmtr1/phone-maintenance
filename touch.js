@@ -92,7 +92,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
                 const itemRef = doc(db, "items", itemId);
                 await updateDoc(itemRef, { selected: true });
-                alert("done");
+                
                 showItemCode(itemData["item-code"]);
             } else {
                 alert("Sold out. No more item codes available.");
