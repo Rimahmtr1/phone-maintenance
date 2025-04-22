@@ -66,6 +66,9 @@ document.addEventListener("DOMContentLoaded", function () {
                 const balance = userData.balance || 0;
 
                 if (balance >= 800000) {
+                    // Deduct 800,000 from balance
+                    const newBalance = balance - 800000;
+                    await updateDoc(userRef, { balance: newBalance });
                     await getOneAvailableItemCode();
                 } else {
                     alert("You don't have enough balance.");
