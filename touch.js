@@ -19,11 +19,12 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth();
 
-// Ensure this function is declared before being used in the HTML
+// Function to open the custom alert
 function openAlert() {
     document.getElementById('customAlert').style.display = 'flex';
 }
 
+// Function to close the custom alert
 function closeAlert() {
     document.getElementById('customAlert').style.display = 'none';
 }
@@ -44,3 +45,9 @@ function handleAction() {
 function checkBalance() {
     alert("Checking balance... (user is logged in)");
 }
+
+// Add the event listener when the page is loaded
+document.addEventListener("DOMContentLoaded", function() {
+    const alertLink = document.querySelector('a[onclick="openAlert()"]');
+    alertLink.addEventListener('click', openAlert);
+});
