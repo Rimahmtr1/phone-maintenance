@@ -1,6 +1,6 @@
 // Import necessary Firebase libraries
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.1.3/firebase-app.js";
-import { getFirestore, collection, getDocs, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/9.1.3/firebase-firestore.js";
+import { getFirestore, collection, getDocs, doc, getDoc, updateDoc, addDoc } from "https://www.gstatic.com/firebasejs/9.1.3/firebase-firestore.js";
 import { getAuth, signOut } from "https://www.gstatic.com/firebasejs/9.1.3/firebase-auth.js";
 
 // Firebase Configuration
@@ -69,11 +69,26 @@ async function displayUserBalance(uid) {
 // Update the user's balance in Firestore
 async function updateUserBalance(uid, newBalance) {
     const userRef = doc(db, "users", uid);
+    const userDoc = await getDoc(userRef);
+    const balanceBefore = userDoc.exists() ? userDoc.data().balance : 0;
+
     await updateDoc(userRef, {
         balance: newBalance
     });
+
+    // Add transaction record
+    await addDoc(collection(db, "transactions"), {
+        amount: newBalance,
+        balance_after: newBalance,
+        balance_before: balanceBefore,
+        transaction_date: new Date().toISOString(),
+        transaction_type: "Top-up",
+        transactionid: uid
+    });
+
     messageDiv.textContent = "Balance updated successfully!";
     messageDiv.className = 'message-success';
+    alert("Success update");
 }
 
 // Event listener for user email selection
