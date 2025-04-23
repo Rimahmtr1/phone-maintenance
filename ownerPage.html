@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Owner Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        .message-success {
+            color: green;
+            font-weight: bold;
+        }
+        .message-error {
+            color: red;
+            font-weight: bold;
+        }
+        #loadingMessage {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>Welcome to the Owner Dashboard</h1>
+    <p>You are logged in as the Owner.</p>
+
+    <div id="loadingMessage">Loading Users...</div>
+    <div id="message" class="message-success"></div>
+
+    <label for="userUID">Select User UID:</label>
+    <select id="userUID" required>
+        <option value="">-- Select a User --</option>
+    </select>
+    <br><br>
+
+    <label for="userBalance">Current Balance:</label>
+    <input type="text" id="userBalance" disabled>
+    <br><br>
+
+    <label for="newBalance">New Balance:</label>
+    <input type="number" id="newBalance" required>
+    <br><br>
+
+    <button id="updateBalanceBtn">Update Balance</button>
+    <br><br>
+
+    <button id="logoutBtn">Logout</button>
+
+    <!-- Include Firebase and Owner.js -->
+    <script type="module" src="https://www.gstatic.com/firebasejs/9.1.3/firebase-app.js"></script>
+    <script type="module" src="https://www.gstatic.com/firebasejs/9.1.3/firebase-auth.js"></script>
+    <script type="module" src="https://www.gstatic.com/firebasejs/9.1.3/firebase-firestore.js"></script>
+    <script type="module" src="OwnerPage.js"></script>
+</body>
+</html>
