@@ -1,4 +1,3 @@
-// Firebase Modules
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.1.3/firebase-app.js";
 import { getFirestore, collection, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/9.1.3/firebase-firestore.js";
 
@@ -13,63 +12,54 @@ const firebaseConfig = {
     measurementId: "G-0MD0GJJ0E2"
 };
 
-// Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// Format date
+// Format ISO date
 function formatDate(iso) {
-    const date = new Date(iso);
-    return date.toLocaleDateString('en-US', { day: '2-digit', month: 'short', year: 'numeric' });
+  const date = new Date(iso);
+  return date.toLocaleDateString('en-US', { day: '2-digit', month: 'short', year: 'numeric' });
 }
 
-// Render transaction card
-function renderTransaction(tx) {
-    const icon = tx.transaction_type === 'purchase' ? '🛒' : '💼';
-    const color = tx.transaction_type === 'purchase' ? 'text-red-500' : 'text-green-500';
-    const sign = tx.transaction_type === 'purchase' ? '-' : '+';
-
-    return `
-      <div class="bg-white p-4 rounded-2xl shadow flex justify-between items-center">
-        <div class="flex items-center gap-4">
-          <div class="text-2xl">${icon}</div>
-          <div>
-            <h3 class="font-semibold">Secret Code: ${tx.secretcode}</h3>
-            <p class="text-sm text-gray-500">${formatDate(tx.transaction_date)} · ${tx.transaction_type}</p>
-            <p class="text-xs text-gray-400">Balance: ${tx.balance_before} ➜ ${tx.balance_after}</p>
-          </div>
-        </div>
-        <div class="${color} font-semibold">${sign} ${tx.amount.toLocaleString()}</div>
-      </div>
-    `;
-}
-
-// Load and display all transactions
+// Load and render transactions
 async function loadTransactions() {
-    const container = document.getElementById('transaction-list');
-    container.innerHTML = `<p class="text-gray-400">Loading...</p>`;
+  const container = document.getElementById('transaction-list');
+  const template = document.getElementById('transaction-template');
 
-    try {
-        const txQuery = query(collection(db, "transactions"), orderBy("transaction_date", "desc"));
-        const snapshot = await getDocs(txQuery);
+  container.innerHTML = `<p class="text-gray-400">Loading...</p>`;
 
-        if (snapshot.empty) {
-            container.innerHTML = `<p class="text-gray-500">No transactions found.</p>`;
-            return;
-        }
+  try {
+    const q = query(collection(db, "transactions"), orderBy("transaction_date", "desc"));
+    const snapshot = await getDocs(q);
 
-        let html = "";
-        snapshot.forEach(doc => {
-            const tx = doc.data();
-            html += renderTransaction(tx);
-        });
-
-        container.innerHTML = html;
-    } catch (err) {
-        console.error("Failed to fetch transactions:", err);
-        container.innerHTML = `<p class="text-red-500">Failed to load transactions.</p>`;
+    if (snapshot.empty) {
+      container.innerHTML = `<p class="text-gray-500">No transactions found.</p>`;
+      return;
     }
+
+    container.innerHTML = ''; // Clear loading text
+
+    snapshot.forEach(doc => {
+      const tx = doc.data();
+      const clone = template.content.cloneNode(true);
+
+      // Fill data
+      clone.querySelector('.icon').textContent = tx.transaction_type === 'purchase' ? '🛒' : '💼';
+      clone.querySelector('.code').textContent = `Secret Code: ${tx.secretcode}`;
+      clone.querySelector('.date-type').textContent = `${formatDate(tx.transaction_date)} · ${tx.transaction_type}`;
+      clone.querySelector('.balance-change').textContent = `Balance: ${tx.balance_before} ➜ ${tx.balance_after}`;
+      clone.querySelector('.amount').textContent = `${tx.transaction_type === 'purchase' ? '-' : '+'} ${tx.amount.toLocaleString()}`;
+      clone.querySelector('.amount').classList.add(
+        tx.transaction_type === 'purchase' ? 'text-red-500' : 'text-green-500'
+      );
+
+      container.appendChild(clone);
+    });
+
+  } catch (err) {
+    console.error("Error loading transactions:", err);
+    container.innerHTML = `<p class="text-red-500">Failed to load transactions.</p>`;
+  }
 }
 
-// Run when DOM is ready
-document.addEventListener("DOMContentLoaded", loadTransactions);
+document.addEventListener('DOMContentLoaded', loadTransactions);
