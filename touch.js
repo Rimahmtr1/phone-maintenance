@@ -1,3 +1,4 @@
+// Firebase setup
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.1.3/firebase-app.js";
 import { getAuth } from "https://www.gstatic.com/firebasejs/9.1.3/firebase-auth.js";
 import {
@@ -13,7 +14,6 @@ import {
   setDoc
 } from "https://www.gstatic.com/firebasejs/9.1.3/firebase-firestore.js";
 
-// Firebase config
 const firebaseConfig = {
   apiKey: "AIzaSyCJsJsuMx1LT6SXZcCqdHa5wkueqXTTT4Q",
   authDomain: "phone-maintenance-18b38.firebaseapp.com",
@@ -29,17 +29,15 @@ const auth = getAuth();
 
 let selectedCategory = null;
 
-document.addEventListener("DOMContentLoaded", () => {
-  const cardButtons = document.querySelectorAll(".background-image");
+window.addEventListener("DOMContentLoaded", () => {
+  const openAlertBtn = document.getElementById("openAlertBtn");
   const alertBox = document.getElementById("customAlert");
   const closeAlertBtn = document.getElementById("closeAlertBtn");
   const buyBtn = document.getElementById("buyBtn");
 
-  cardButtons.forEach(btn => {
-    btn.addEventListener("click", event => {
-      selectedCategory = event.target.dataset.category || event.currentTarget.dataset.category;
-      alertBox.style.display = "flex";
-    });
+  openAlertBtn.addEventListener("click", (event) => {
+    selectedCategory = event.target.dataset.category || event.currentTarget.dataset.category;
+    alertBox.style.display = "flex";
   });
 
   closeAlertBtn.addEventListener("click", () => {
@@ -81,7 +79,7 @@ async function handlePurchase(userId, category) {
 
     await saveTransaction(userId, itemData["item-code"], 800000, "purchase", balance, newBalance);
 
-    window.location.href = `touch-buy.html?code=${encodeURIComponent(itemData["item-code"])}`;
+    window.location.href = `touch-buy.html?code=${encodeURIComponent(itemData["item-code"])}&category=${encodeURIComponent(category)}`;
   } catch (err) {
     alert("Error during purchase: " + err.message);
   }
