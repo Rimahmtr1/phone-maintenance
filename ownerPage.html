@@ -3,55 +3,75 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Owner Dashboard</title>
+    <title>Owner Page</title>
     <style>
+        /* Basic styles */
         body {
             font-family: Arial, sans-serif;
             padding: 20px;
         }
+        #loadingMessage {
+            display: none;
+            color: orange;
+        }
+        #message {
+            display: none;
+            margin-top: 10px;
+        }
         .message-success {
             color: green;
-            font-weight: bold;
         }
         .message-error {
             color: red;
-            font-weight: bold;
         }
-        #loadingMessage {
-            display: none;
+        .form-group {
+            margin-bottom: 15px;
         }
     </style>
 </head>
 <body>
-    <h1>Welcome to the Owner Dashboard</h1>
-    <p>You are logged in as the Owner.</p>
+    <h2>Owner Page</h2>
 
-    <div id="loadingMessage">Loading Users...</div>
-    <div id="message" class="message-success"></div>
+    <!-- Display logged-in user's email -->
+    <p id="loggedInUserEmail"></p>
 
-    <label for="userUID">Select User UID:</label>
-    <select id="userUID" required>
-        <option value="">-- Select a User --</option>
-    </select>
-    <br><br>
+    <!-- Loading Message -->
+    <div id="loadingMessage">Loading users...</div>
 
-    <label for="userBalance">Current Balance:</label>
-    <input type="text" id="userBalance" disabled>
-    <br><br>
+    <!-- User Selection Dropdown -->
+    <div class="form-group">
+        <label for="userEmail">Select User</label>
+        <select id="userEmail">
+            <option value="">-- Select a user --</option>
+        </select>
+    </div>
 
-    <label for="newBalance">New Balance:</label>
-    <input type="number" id="newBalance" required>
-    <br><br>
+    <!-- User Balance -->
+    <div class="form-group">
+        <label for="userBalance">User Balance</label>
+        <input type="number" id="userBalance" disabled />
+    </div>
 
-    <button id="updateBalanceBtn">Update Balance</button>
-    <br><br>
+    <!-- New Balance Input -->
+    <div class="form-group">
+        <label for="newBalance">New Balance</label>
+        <input type="number" id="newBalance" />
+    </div>
 
-    <button id="logoutBtn">Logout</button>
+    <!-- Update Button -->
+    <div class="form-group">
+        <button id="updateBalanceBtn">Update Balance</button>
+    </div>
 
-    <!-- Include Firebase and Owner.js -->
-    <script type="module" src="https://www.gstatic.com/firebasejs/9.1.3/firebase-app.js"></script>
-    <script type="module" src="https://www.gstatic.com/firebasejs/9.1.3/firebase-auth.js"></script>
-    <script type="module" src="https://www.gstatic.com/firebasejs/9.1.3/firebase-firestore.js"></script>
+    <!-- Message Div -->
+    <div id="message"></div>
+
+    <!-- Logout Button -->
+    <div class="form-group">
+        <button id="logoutBtn">Logout</button>
+    </div>
+
+    <!-- Firebase and JS Scripts -->
     <script type="module" src="OwnerPage.js"></script>
 </body>
 </html>
