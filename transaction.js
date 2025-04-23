@@ -52,6 +52,8 @@ async function loadUserTransactions(userId) {
     container.innerHTML = `<p class="text-gray-400">Loading...</p>`;
 
     try {
+        console.log("Fetching transactions for user:", userId);
+
         // Query Firestore for transactions where transactionid matches userId
         const q = query(
             collection(db, "transactions"),
@@ -59,6 +61,8 @@ async function loadUserTransactions(userId) {
             orderBy("transaction_date", "desc")   // Order by transaction date, latest first
         );
         const snapshot = await getDocs(q);
+
+        console.log("Query snapshot:", snapshot);
 
         if (snapshot.empty) {
             container.innerHTML = `<p class="text-gray-500">No transactions found for this user.</p>`;
@@ -77,17 +81,17 @@ async function loadUserTransactions(userId) {
     } catch (err) {
         console.error("Error loading transactions:", err);
         container.innerHTML = `<p class="text-red-500">Failed to load transactions. Please try again later.</p>`;
-        // If it's a query index error, print more specific information
         if (err.message.includes("The query requires an index")) {
             container.innerHTML += `<p class="text-red-500">It seems like Firestore needs an index for this query. You can create it by following this link: <a href="${err.message.match(/https:\/\/console\.firebase\.google\.com[^\s]+/)}" target="_blank" class="underline">Create Index</a></p>`;
         }
     }
 }
 
-// Check if the user is logged in and load their transactions
+
 onAuthStateChanged(auth, (user) => {
     if (user) {
         const userId = user.uid;  // Get the logged-in user's UID
+        console.log("User UID:", userId);
         document.getElementById('auth-status').innerHTML = `<p class="text-green-500">Logged in as ${user.email}</p>`;
         loadUserTransactions(userId);  // Load transactions for the logged-in user
     } else {
@@ -96,3 +100,4 @@ onAuthStateChanged(auth, (user) => {
         document.getElementById('no-transactions').classList.add('hidden');
     }
 });
+
