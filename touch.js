@@ -30,7 +30,7 @@ const auth = getAuth();
 let selectedCategory = null;
 
 document.addEventListener("DOMContentLoaded", () => {
-  const cardButtons = document.querySelectorAll(".card-button");
+  const cardButtons = document.querySelectorAll(".background-image");
   const alertBox = document.getElementById("customAlert");
   const closeAlertBtn = document.getElementById("closeAlertBtn");
   const buyBtn = document.getElementById("buyBtn");
