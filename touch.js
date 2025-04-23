@@ -1,153 +1,124 @@
-// Firebase Modules
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.1.3/firebase-app.js";
 import { getAuth } from "https://www.gstatic.com/firebasejs/9.1.3/firebase-auth.js";
 import {
-    getFirestore,
-    collection,
-    query,
-    where,
-    limit,
-    getDocs,
-    updateDoc,
-    doc,
-    getDoc,
-    setDoc
+  getFirestore,
+  collection,
+  query,
+  where,
+  limit,
+  getDocs,
+  updateDoc,
+  doc,
+  getDoc,
+  setDoc
 } from "https://www.gstatic.com/firebasejs/9.1.3/firebase-firestore.js";
 
-// Firebase Configuration
+// Firebase config
 const firebaseConfig = {
-    apiKey: "AIzaSyCJsJsuMx1LT6SXZcCqdHa5wkueqXTTT4Q",
-    authDomain: "phone-maintenance-18b38.firebaseapp.com",
-    projectId: "phone-maintenance-18b38",
-    storageBucket: "phone-maintenance-18b38.appspot.com",
-    messagingSenderId: "881648450762",
-    appId: "1:881648450762:web:b17fef83d6015c65a40833",
-    measurementId: "G-0MD0GJJ0E2"
+  apiKey: "AIzaSyCJsJsuMx1LT6SXZcCqdHa5wkueqXTTT4Q",
+  authDomain: "phone-maintenance-18b38.firebaseapp.com",
+  projectId: "phone-maintenance-18b38",
+  storageBucket: "phone-maintenance-18b38.appspot.com",
+  messagingSenderId: "881648450762",
+  appId: "1:881648450762:web:b17fef83d6015c65a40833"
 };
 
-// Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth();
 
-document.addEventListener("DOMContentLoaded", function () {
-    // UI functions
-    function openAlert() {
-        document.getElementById('customAlert').style.display = 'flex';
+let selectedCategory = null;
+
+document.addEventListener("DOMContentLoaded", () => {
+  const cardButtons = document.querySelectorAll(".card-button");
+  const alertBox = document.getElementById("customAlert");
+  const closeAlertBtn = document.getElementById("closeAlertBtn");
+  const buyBtn = document.getElementById("buyBtn");
+
+  cardButtons.forEach(btn => {
+    btn.addEventListener("click", event => {
+      selectedCategory = event.target.dataset.category || event.currentTarget.dataset.category;
+      alertBox.style.display = "flex";
+    });
+  });
+
+  closeAlertBtn.addEventListener("click", () => {
+    alertBox.style.display = "none";
+  });
+
+  buyBtn.addEventListener("click", async () => {
+    if (!selectedCategory) {
+      return alert("No category selected.");
     }
 
-    function closeAlert() {
-        document.getElementById('customAlert').style.display = 'none';
-    }
+    const confirmBuy = confirm("Are you sure you want to buy this item?");
+    if (!confirmBuy) return;
 
-    const openAlertBtn = document.getElementById("openAlertBtn");
-    const closeAlertBtn = document.getElementById("closeAlertBtn");
-    const buyBtn = document.getElementById("buyBtn");
+    const userId = localStorage.getItem("loggedUserId");
+    if (!userId) return alert("Please log in to proceed.");
 
-    if (openAlertBtn) openAlertBtn.addEventListener("click", openAlert);
-    if (closeAlertBtn) closeAlertBtn.addEventListener("click", closeAlert);
-    if (buyBtn) buyBtn.addEventListener("click", handleAction);
+    await handlePurchase(userId, selectedCategory);
+  });
+});
 
-    function handleAction() {
-        // Display confirmation alert before proceeding with the purchase
-        const confirmed = confirm("Are you sure you want to buy this item? 123");
-        
-        if (confirmed) {
-            const userId = localStorage.getItem('loggedUserId');
-            if (userId) {
-                checkBalance(userId);  // Proceed with checking balance
-            } else {
-                alert("Please log in or sign up to continue.");
-            }
-        } else {
-            alert("Purchase canceled.");  // If the user cancels the purchase
-        }
-    }
+async function handlePurchase(userId, category) {
+  try {
+    const userRef = doc(db, "users", userId);
+    const userSnap = await getDoc(userRef);
 
-    async function checkBalance(userId) {
-        try {
-            const userRef = doc(db, "users", userId);
-            const userSnap = await getDoc(userRef);
+    if (!userSnap.exists()) return alert("User not found.");
 
-            if (!userSnap.exists()) return alert("User data not found.");
+    const userData = userSnap.data();
+    const balance = userData.balance || 0;
 
-            const userData = userSnap.data();
-            const balance = userData.balance || 0;
+    if (balance < 800000) return alert("Insufficient balance.");
 
-            if (balance < 800000) return alert("You don't have enough balance.");
+    const itemData = await getAvailableItem(userId, category);
+    if (!itemData) return;
 
-            const itemData = await getOneAvailableItemCode(userId); // 🔁 Pass userId
-            if (!itemData) return; // ⛔ Don't show anything if item was not assigned
+    const newBalance = balance - 800000;
+    await updateDoc(userRef, { balance: newBalance });
 
-            // 👇 Update balance AFTER item was secured
-            const newBalance = balance - 800000;
-            await updateDoc(userRef, { balance: newBalance });
+    await saveTransaction(userId, itemData["item-code"], 800000, "purchase", balance, newBalance);
 
-            // Save the transaction
-            await saveTransaction(userId, itemData["item-code"], 800000, 'purchase', balance, newBalance);
+    window.location.href = `touch-buy.html?code=${encodeURIComponent(itemData["item-code"])}`;
+  } catch (err) {
+    alert("Error during purchase: " + err.message);
+  }
+}
 
-            showItemCode(itemData["item-code"]);
+async function getAvailableItem(userId, category) {
+  const q = query(
+    collection(db, "items"),
+    where("selected", "==", false),
+    where("category", "==", category),
+    limit(1)
+  );
 
-        } catch (error) {
-            alert("Error checking balance: " + error.message);
-        }
-    }
+  const snapshot = await getDocs(q);
+  if (snapshot.empty) {
+    alert("Sold out.");
+    return null;
+  }
 
-    async function getOneAvailableItemCode(userId) {
-        const itemsRef = collection(db, "items");
-        const q = query(itemsRef, where("selected", "==", false), limit(1));
+  const docData = snapshot.docs[0];
+  await updateDoc(doc(db, "items", docData.id), {
+    selected: true,
+    selectedBy: userId
+  });
 
-        try {
-            const querySnapshot = await getDocs(q);
+  return docData.data();
+}
 
-            if (querySnapshot.empty) {
-                alert("Sold out. No more item codes available.");
-                return null;
-            }
-
-            const itemDoc = querySnapshot.docs[0];
-            const itemId = itemDoc.id;
-            const itemData = itemDoc.data();
-
-            const itemRef = doc(db, "items", itemId);
-            await updateDoc(itemRef, {
-                selected: true,
-                selectedBy: userId // 🔥 this is required for rule to pass
-            });
-
-            return itemData;
-
-        } catch (error) {
-            alert("Error fetching item code: " + error.message);
-            return null;
-        }
-    }
-
-    // ✅ This function saves the transaction data
-    async function saveTransaction(userId, itemCode, amount, transactionType, balanceBefore, balanceAfter) {
-        const transactionRef = doc(collection(db, "transactions")); // Firestore auto-id
-
-        const transactionData = {
-            transactionid: userId,
-            secretcode: itemCode,
-            transaction_date: new Date().toISOString(), // Current date and time
-            amount: amount,
-            transaction_type: transactionType,
-            balance_before: balanceBefore,
-            balance_after: balanceAfter
-        };
-
-        try {
-            await setDoc(transactionRef, transactionData);
-            console.log("Transaction saved successfully!");
-        } catch (error) {
-            alert("Error saving transaction: " + error.message);
-        }
-    }
-
-    // ✅ This function lives outside DOMContentLoaded
-    function showItemCode(code) {
-        window.location.href = `touch-buy.html?code=${encodeURIComponent(code)}`;
-    }
-
-}); // Closes DOMContentLoaded
+async function saveTransaction(userId, code, amount, type, before, after) {
+  const ref = doc(collection(db, "transactions"));
+  await setDoc(ref, {
+    transactionid: userId,
+    secretcode: code,
+    transaction_date: new Date().toISOString(),
+    amount,
+    transaction_type: type,
+    balance_before: before,
+    balance_after: after
+  });
+}
