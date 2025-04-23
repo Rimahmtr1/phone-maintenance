@@ -45,7 +45,6 @@ function renderTransaction(tx) {
     `;
 }
 
-// Function to load transaction details for the signed-in user
 async function loadUserTransactions(userId) {
     const container = document.getElementById('transaction-list');
     const noTransactionsMessage = document.getElementById('no-transactions');
@@ -53,34 +52,35 @@ async function loadUserTransactions(userId) {
     container.innerHTML = `<p class="text-gray-400">Loading...</p>`;
 
     try {
-        // Query the Firestore "transactions" collection for documents where "transactionid" matches the user's ID
+        // Query Firestore for transactions where transactionid matches userId
         const q = query(
             collection(db, "transactions"),
-            where("transactionid", "==", userId), // Fetch transactions where transactionid equals user's UID
-            orderBy("transaction_date", "desc")   // Order by transaction date, most recent first
+            where("transactionid", "==", userId), // Match the user's ID with the transaction ID
+            orderBy("transaction_date", "desc")   // Order by transaction date, latest first
         );
         const snapshot = await getDocs(q);
 
-        // Check if there are no transactions
         if (snapshot.empty) {
-            container.innerHTML = `<p class="text-gray-500">No transactions found.</p>`;
+            container.innerHTML = `<p class="text-gray-500">No transactions found for this user.</p>`;
             noTransactionsMessage.classList.remove('hidden');  // Show message if no transactions
             return;
         }
 
-        // Clear the "Loading..." message and hide "no transactions" message
-        container.innerHTML = '';
-        noTransactionsMessage.classList.add('hidden'); 
+        container.innerHTML = '';  // Clear loading message
+        noTransactionsMessage.classList.add('hidden');  // Hide message if transactions exist
 
-        // Loop through all documents in the snapshot and render each transaction
         snapshot.forEach(doc => {
             const tx = doc.data();
             const html = renderTransaction(tx);
-            container.innerHTML += html; // Append transaction details to the page
+            container.innerHTML += html; // Append transaction to list
         });
     } catch (err) {
         console.error("Error loading transactions:", err);
-        container.innerHTML = `<p class="text-red-500">Failed to load transactions.</p>`;
+        container.innerHTML = `<p class="text-red-500">Failed to load transactions. Please try again later.</p>`;
+        // If it's a query index error, print more specific information
+        if (err.message.includes("The query requires an index")) {
+            container.innerHTML += `<p class="text-red-500">It seems like Firestore needs an index for this query. You can create it by following this link: <a href="${err.message.match(/https:\/\/console\.firebase\.google\.com[^\s]+/)}" target="_blank" class="underline">Create Index</a></p>`;
+        }
     }
 }
 
