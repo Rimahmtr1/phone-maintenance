@@ -54,7 +54,7 @@ async function loadUserTransactions(userId) {
     try {
         const q = query(
             collection(db, "transactions"),
-            where("transactionid", "==", userId),
+            where("transactionid", "==", userId), // Fetch transactions where transactionid matches userId
             orderBy("transaction_date", "desc")
         );
         const snapshot = await getDocs(q);
@@ -68,19 +68,8 @@ async function loadUserTransactions(userId) {
 
         snapshot.forEach(doc => {
             const tx = doc.data();
-            const clone = template.content.cloneNode(true);
-
-            // Fill data
-            clone.querySelector('.icon').textContent = tx.transaction_type === 'purchase' ? '🛒' : '💼';
-            clone.querySelector('.code').textContent = `Secret Code: ${tx.secretcode}`;
-            clone.querySelector('.date-type').textContent = `${formatDate(tx.transaction_date)} · ${tx.transaction_type}`;
-            clone.querySelector('.balance-change').textContent = `Balance: ${tx.balance_before} ➜ ${tx.balance_after}`;
-            clone.querySelector('.amount').textContent = `${tx.transaction_type === 'purchase' ? '-' : '+'} ${tx.amount.toLocaleString()}`;
-            clone.querySelector('.amount').classList.add(
-                tx.transaction_type === 'purchase' ? 'text-red-500' : 'text-green-500'
-            );
-
-            container.appendChild(clone);
+            const html = renderTransaction(tx);
+            container.innerHTML += html;
         });
 
     } catch (err) {
