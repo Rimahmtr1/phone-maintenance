@@ -54,7 +54,7 @@ signInButton.addEventListener('click', (event) => {
                 showMessage('Login successful! Welcome, Owner.', 'signInMessage');
                 
                 // Redirect to the Owner's page
-                window.location.href = "owner.html";  // Redirect to the owner panel page
+                window.location.href = "ownerPage.html";  // Redirect to the owner panel page
             } else {
                 // Show message if the logged-in user is not the owner
                 showMessage('Access denied: You are not an authorized owner.', 'signInMessage');
