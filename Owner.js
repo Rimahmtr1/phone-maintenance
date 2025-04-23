@@ -1,5 +1,9 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.1.3/firebase-app.js";
-import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.1.3/firebase-auth.js";
+import {
+  getAuth,
+  signInWithEmailAndPassword,
+  onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/9.1.3/firebase-auth.js";
 import {
   getFirestore,
   collection,
@@ -11,7 +15,7 @@ import {
   increment
 } from "https://www.gstatic.com/firebasejs/9.1.3/firebase-firestore.js";
 
-// Firebase Config
+// Firebase config
 const firebaseConfig = {
   apiKey: "AIzaSyCJsJsuMx1LT6SXZcCqdHa5wkueqXTTT4Q",
   authDomain: "phone-maintenance-18b38.firebaseapp.com",
@@ -23,30 +27,36 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
 const auth = getAuth(app);
+const db = getFirestore(app);
 
-let selectedUserId = null;
+// Hardcoded owner credentials
+const OWNER_EMAIL = "remahmattar@gmail.com";
+const OWNER_UID = "bvZbjkSBKMgRiSJpHrqvqGhOLbZ2";
 
-onAuthStateChanged(auth, async (user) => {
-  const authStatus = document.getElementById("authStatus");
-  const ownerPanel = document.getElementById("ownerPanel");
+document.getElementById("loginBtn").addEventListener("click", async () => {
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
+  const status = document.getElementById("loginStatus");
 
-  if (user) {
-    const joinRef = doc(db, "joinedUsers", user.uid);
-    const joinSnap = await getDoc(joinRef);
+  try {
+    const userCredential = await signInWithEmailAndPassword(auth, email, password);
+    const user = userCredential.user;
 
-    if (joinSnap.exists()) {
-      authStatus.style.display = "none";
-      ownerPanel.style.display = "block";
+    if (user.uid === OWNER_UID && user.email === OWNER_EMAIL) {
+      status.textContent = "Login successful!";
+      document.getElementById("loginSection").style.display = "none";
+      document.getElementById("ownerPanel").style.display = "block";
       loadUserList();
     } else {
-      authStatus.innerText = "Access denied: Not a joined user.";
+      status.textContent = "Access denied: Not an authorized owner.";
     }
-  } else {
-    authStatus.innerText = "User not signed in.";
+  } catch (error) {
+    status.textContent = "Login failed: " + error.message;
   }
 });
+
+let selectedUserId = null;
 
 async function loadUserList() {
   const userSelect = document.getElementById("userSelect");
@@ -65,7 +75,6 @@ async function loadUserList() {
     loadBalance(selectedUserId);
   });
 
-  // Preload first user
   if (userSelect.options.length > 0) {
     selectedUserId = userSelect.options[0].value;
     loadBalance(selectedUserId);
@@ -86,18 +95,15 @@ window.topupBalance = async function () {
 
   const amount = parseFloat(document.getElementById("topupAmount").value);
   if (isNaN(amount) || amount <= 0) {
-    alert("Enter a valid top-up amount.");
+    alert("Please enter a valid amount");
     return;
   }
 
   const userRef = doc(db, "users", selectedUserId);
-
-  // Update balance
   await updateDoc(userRef, {
     balance: increment(amount)
   });
 
-  // Log transaction
   await setDoc(doc(collection(db, "transactions")), {
     userId: selectedUserId,
     amount: amount,
@@ -105,7 +111,6 @@ window.topupBalance = async function () {
     timestamp: new Date()
   });
 
-  // Refresh UI
   loadBalance(selectedUserId);
-  alert("Top-up successful!");
+  alert("Top-up successful");
 };
