@@ -3,7 +3,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/9.1.3/firebase
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.1.3/firebase-auth.js";
 import { getFirestore, collection, getDocs, query, where, orderBy } from "https://www.gstatic.com/firebasejs/9.1.3/firebase-firestore.js";
 
-// Firebase Initialization
+// Initialize Firebase
 const firebaseConfig = {
     apiKey: "AIzaSyCJsJsuMx1LT6SXZcCqdHa5wkueqXTTT4Q",
     authDomain: "phone-maintenance-18b38.firebaseapp.com",
@@ -18,86 +18,91 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth();
 
-// Function to format dates
+// Helper to format dates
 function formatDate(iso) {
     const date = new Date(iso);
-    return date.toLocaleDateString('en-US', { day: '2-digit', month: 'short', year: 'numeric' });
+    return date.toLocaleDateString('en-US', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+    });
 }
 
-// Function to render each transaction
+// Render individual transaction
 function renderTransaction(tx) {
     const icon = tx.transaction_type === 'purchase' ? '🛒' : '💼';
     const color = tx.transaction_type === 'purchase' ? 'text-red-500' : 'text-green-500';
     const sign = tx.transaction_type === 'purchase' ? '-' : '+';
 
     return `
-      <div class="bg-white p-4 rounded-2xl shadow flex justify-between items-center">
-        <div class="flex items-center gap-4">
-          <div class="text-2xl">${icon}</div>
-          <div>
-            <h3 class="font-semibold">Secret Code: ${tx.secretcode}</h3>
-            <p class="text-sm text-gray-500">${formatDate(tx.transaction_date)} · ${tx.transaction_type}</p>
-            <p class="text-xs text-gray-400">Balance: ${tx.balance_before} ➜ ${tx.balance_after}</p>
-          </div>
+        <div class="bg-white p-4 rounded-2xl shadow flex justify-between items-start">
+            <div class="flex gap-4">
+                <div class="text-3xl pt-1">${icon}</div>
+                <div>
+                    <h3 class="text-lg font-semibold">Secret Code: ${tx.secretcode || 'N/A'}</h3>
+                    <p class="text-sm text-gray-700"><strong>Date:</strong> ${formatDate(tx.transaction_date)}</p>
+                    <p class="text-sm text-gray-700"><strong>Type:</strong> ${tx.transaction_type}</p>
+                    <p class="text-xs text-gray-400">Balance: ${tx.balance_before} ➜ ${tx.balance_after}</p>
+                </div>
+            </div>
+            <div class="${color} font-semibold text-lg">${sign} ${tx.amount.toLocaleString()}</div>
         </div>
-        <div class="${color} font-semibold">${sign} ${tx.amount.toLocaleString()}</div>
-      </div>
     `;
 }
 
+// Load all user transactions from Firestore
 async function loadUserTransactions(userId) {
     const container = document.getElementById('transaction-list');
     const noTransactionsMessage = document.getElementById('no-transactions');
-
     container.innerHTML = `<p class="text-gray-400">Loading...</p>`;
 
     try {
-        console.log("Fetching transactions for user:", userId);
-
-        // Query Firestore for transactions where transactionid matches userId
         const q = query(
             collection(db, "transactions"),
-            where("transactionid", "==", userId), // Match the user's ID with the transaction ID
-            orderBy("transaction_date", "desc")   // Order by transaction date, latest first
+            where("transactionid", "==", userId),
+            orderBy("transaction_date", "desc")
         );
-        const snapshot = await getDocs(q);
 
-        console.log("Query snapshot:", snapshot);
+        const snapshot = await getDocs(q);
 
         if (snapshot.empty) {
             container.innerHTML = `<p class="text-gray-500">No transactions found for this user.</p>`;
-            noTransactionsMessage.classList.remove('hidden');  // Show message if no transactions
+            noTransactionsMessage.classList.remove('hidden');
             return;
         }
 
-        container.innerHTML = '';  // Clear loading message
-        noTransactionsMessage.classList.add('hidden');  // Hide message if transactions exist
+        container.innerHTML = '';
+        noTransactionsMessage.classList.add('hidden');
 
         snapshot.forEach(doc => {
             const tx = doc.data();
-            const html = renderTransaction(tx);
-            container.innerHTML += html; // Append transaction to list
+            container.innerHTML += renderTransaction(tx);
         });
+
     } catch (err) {
         console.error("Error loading transactions:", err);
         container.innerHTML = `<p class="text-red-500">Failed to load transactions. Please try again later.</p>`;
+
         if (err.message.includes("The query requires an index")) {
-            container.innerHTML += `<p class="text-red-500">It seems like Firestore needs an index for this query. You can create it by following this link: <a href="${err.message.match(/https:\/\/console\.firebase\.google\.com[^\s]+/)}" target="_blank" class="underline">Create Index</a></p>`;
+            const indexUrl = err.message.match(/https:\/\/console\.firebase\.google\.com[^\s]+/);
+            if (indexUrl) {
+                container.innerHTML += `<p class="text-red-500">Firestore needs an index. <a href="${indexUrl}" target="_blank" class="underline">Click here to create it.</a></p>`;
+            }
         }
     }
 }
 
-
+// Auth state listener
 onAuthStateChanged(auth, (user) => {
+    const status = document.getElementById('auth-status');
     if (user) {
-        const userId = user.uid;  // Get the logged-in user's UID
-        console.log("User UID:", userId);
-        document.getElementById('auth-status').innerHTML = `<p class="text-green-500">Logged in as ${user.email}</p>`;
-        loadUserTransactions(userId);  // Load transactions for the logged-in user
+        status.innerHTML = `<p class="text-green-500">Logged in as ${user.email}</p>`;
+        loadUserTransactions(user.uid);
     } else {
-        document.getElementById('auth-status').innerHTML = `<p class="text-red-500">Not logged in. Please log in to view transactions.</p>`;
-        document.getElementById('transaction-list').innerHTML = ''; // Clear transactions if not logged in
-        document.getElementById('no-transactions').classList.add('hidden');
+        status.innerHTML = `<p class="text-red-500">Not logged in. Please log in to view transactions.</p>`;
+        document.getElementById('transaction-list').innerHTML = '';
+        document.getElementById('no-transactions').classList.remove('hidden');
     }
 });
-
