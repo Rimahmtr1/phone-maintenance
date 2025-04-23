@@ -1,6 +1,6 @@
 // Import necessary Firebase libraries
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.1.3/firebase-app.js";
-import { getFirestore, collection, getDocs, doc, updateDoc } from "https://www.gstatic.com/firebasejs/9.1.3/firebase-firestore.js";
+import { getFirestore, collection, getDocs, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/9.1.3/firebase-firestore.js";
 import { getAuth, signOut } from "https://www.gstatic.com/firebasejs/9.1.3/firebase-auth.js";
 
 // Firebase Configuration
@@ -20,13 +20,14 @@ const db = getFirestore(app);
 const auth = getAuth();
 
 // Get UI elements
-const userUIDSelect = document.getElementById('userUID');
+const userEmailSelect = document.getElementById('userEmail');
 const userBalanceInput = document.getElementById('userBalance');
 const newBalanceInput = document.getElementById('newBalance');
 const updateBalanceBtn = document.getElementById('updateBalanceBtn');
 const messageDiv = document.getElementById('message');
 const loadingMessageDiv = document.getElementById('loadingMessage');
 const logoutBtn = document.getElementById('logoutBtn');
+const loggedInUserEmailDiv = document.getElementById('loggedInUserEmail');
 
 // Define the owner UID
 const OWNER_UID = "bvZbjkSBKMgRiSJpHrqvqGhOLbZ2";
@@ -42,12 +43,12 @@ async function getUsers() {
         ...doc.data()
     }));
 
-    // Populate the dropdown with user UIDs
+    // Populate the dropdown with user emails and associate them with UIDs
     users.forEach(user => {
         const option = document.createElement('option');
-        option.value = user.id;
-        option.textContent = user.id;
-        userUIDSelect.appendChild(option);
+        option.value = user.id; // Store UID as value
+        option.textContent = user.email; // Display email in the dropdown
+        userEmailSelect.appendChild(option);
     });
 
     loadingMessageDiv.style.display = "none";
@@ -75,9 +76,9 @@ async function updateUserBalance(uid, newBalance) {
     messageDiv.className = 'message-success';
 }
 
-// Event listener for user UID selection
-userUIDSelect.addEventListener('change', async () => {
-    const selectedUID = userUIDSelect.value;
+// Event listener for user email selection
+userEmailSelect.addEventListener('change', async () => {
+    const selectedUID = userEmailSelect.value;
     if (selectedUID) {
         await displayUserBalance(selectedUID);
     }
@@ -85,7 +86,7 @@ userUIDSelect.addEventListener('change', async () => {
 
 // Event listener for updating the balance
 updateBalanceBtn.addEventListener('click', async () => {
-    const selectedUID = userUIDSelect.value;
+    const selectedUID = userEmailSelect.value;
     const newBalance = newBalanceInput.value;
 
     if (!selectedUID || !newBalance) {
@@ -104,6 +105,15 @@ logoutBtn.addEventListener('click', () => {
     }).catch((error) => {
         console.error("Error during sign-out:", error);
     });
+});
+
+// Display the logged-in user's email
+auth.onAuthStateChanged((user) => {
+    if (user) {
+        loggedInUserEmailDiv.textContent = `Logged in as: ${user.email}`;
+    } else {
+        loggedInUserEmailDiv.textContent = "No user logged in.";
+    }
 });
 
 // Load users when the page loads
