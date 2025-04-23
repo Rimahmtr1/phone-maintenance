@@ -2,84 +2,25 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Transaction Page</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Transactions</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-50 text-gray-800 font-sans">
 
-  <!-- Account Summary -->
-  <div class="bg-white shadow p-6 rounded-b-2xl mb-4">
-    <div class="flex items-center justify-between">
-      <div>
-        <h1 class="text-2xl font-bold">💼 My Wallet</h1>
-        <p class="text-sm text-gray-500 mt-1">Balance: 
-          <span class="text-green-600 font-semibold">$2,460.23</span>
-        </p>
-      </div>
-      <div class="space-x-2">
-        <button class="bg-indigo-600 text-white px-4 py-2 rounded-xl hover:bg-indigo-700">Add Transaction</button>
-        <button class="border border-indigo-600 text-indigo-600 px-4 py-2 rounded-xl hover:bg-indigo-50">Export</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Date Filter -->
-  <div class="px-6 mb-4">
-    <div class="flex items-center gap-4">
-      <input type="date" class="px-4 py-2 border rounded-xl" />
-      <button class="text-sm text-gray-500 hover:underline">Clear Date</button>
-    </div>
+  <!-- Header -->
+  <div class="bg-white shadow p-6 rounded-b-2xl mb-6">
+    <h1 class="text-2xl font-bold">📋 Transaction History</h1>
+    <p class="text-sm text-gray-500 mt-1">All your transaction records</p>
   </div>
 
   <!-- Transaction List -->
-  <div class="px-6 space-y-4">
-    <!-- Transaction Card Example 1 -->
-    <div class="bg-white p-4 rounded-2xl shadow flex justify-between items-center">
-      <div class="flex items-center gap-4">
-        <div class="text-2xl">🛒</div>
-        <div>
-          <h3 class="font-semibold">Starbucks Coffee</h3>
-          <p class="text-sm text-gray-500">22 Apr 2025 · Food & Drink</p>
-        </div>
-      </div>
-      <div class="text-red-500 font-semibold">- $5.40</div>
-    </div>
-
-    <!-- Transaction Card Example 2 -->
-    <div class="bg-white p-4 rounded-2xl shadow flex justify-between items-center">
-      <div class="flex items-center gap-4">
-        <div class="text-2xl">💼</div>
-        <div>
-          <h3 class="font-semibold">Freelance Payment</h3>
-          <p class="text-sm text-gray-500">20 Apr 2025 · Income</p>
-        </div>
-      </div>
-      <div class="text-green-500 font-semibold">+ $1,200.00</div>
-    </div>
+  <div id="transaction-list" class="px-6 space-y-4">
+    <!-- JavaScript will load transactions here -->
   </div>
 
-  <!-- Summary Section -->
-  <div class="px-6 mt-8">
-    <div class="bg-white p-6 rounded-2xl shadow">
-      <h2 class="text-lg font-bold mb-4">📊 Monthly Summary</h2>
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <p class="text-sm text-gray-500">Top Category: 
-            <span class="text-gray-800 font-medium">Food & Drink</span>
-          </p>
-          <p class="text-sm text-gray-500">Total Spent: 
-            <span class="text-red-500 font-semibold">$320.12</span>
-          </p>
-        </div>
-        <div>
-          <p class="text-sm text-gray-500">Total Income: 
-            <span class="text-green-500 font-semibold">$1,500.00</span>
-          </p>
-        </div>
-      </div>
-    </div>
-  </div>
+  <!-- JS -->
+  <script type="module" src="transaction.js"></script>
 
 </body>
 </html>
