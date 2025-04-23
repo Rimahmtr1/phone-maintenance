@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Owner - Top-Up</title>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-firestore.js"></script>
+</head>
+<body>
+    <div id="auth-status"></div>
+    <h1>Owner Top-Up Page</h1>
+
+    <form id="topup-form">
+        <input type="text" id="userId" placeholder="User ID" required>
+        <input type="number" id="amount" placeholder="Amount to Top-Up" required>
+        <button type="submit">Top-Up</button>
+    </form>
+
+    <script>
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyCJsJsuMx1LT6SXZcCqdHa5wkueqXTTT4Q",
+            authDomain: "phone-maintenance-18b38.firebaseapp.com",
+            projectId: "phone-maintenance-18b38",
+            storageBucket: "phone-maintenance-18b38.appspot.com",
+            messagingSenderId: "881648450762",
+            appId: "1:881648450762:web:b17fef83d6015c65a40833",
+            measurementId: "G-0MD0GJJ0E2"
+        };
+
+        const app = firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        // The owner's UID (only this UID should be allowed access)
+        const ownerUID = "YOUR_UID_HERE";  // Replace with your actual UID
+
+        // Check if the logged-in user is the owner
+        firebase.auth().onAuthStateChanged((user) => {
+            if (user) {
+                if (user.uid !== ownerUID) {
+                    // Redirect if the user is not the owner
+                    window.location.href = "index.html";  // Redirect to a safe page
+                } else {
+                    // Display logged-in owner info
+                    document.getElementById("auth-status").innerHTML = `<p class="text-green-500">Logged in as ${user.email}</p>`;
+                }
+            } else {
+                // Redirect to login page if no user is logged in
+                window.location.href = "login.html";
+            }
+        });
+
+        // Handle top-up form submission
+        document.getElementById("topup-form").addEventListener("submit", async (e) => {
+            e.preventDefault();
+
+            const userId = document.getElementById("userId").value;
+            const amount = parseFloat(document.getElementById("amount").value);
+
+            try {
+                const userDoc = await db.collection("users").doc(userId).get();
+
+                if (!userDoc.exists) {
+                    alert("User not found!");
+                    return;
+                }
+
+                const currentBalance = userDoc.data().balance || 0;
+                const newBalance = currentBalance + amount;
+
+                await db.collection("users").doc(userId).update({ balance: newBalance });
+
+                alert(`Balance updated! New balance: ${newBalance}`);
+
+                await db.collection("transactions").add({
+                    transactionid: userId,
+                    amount: amount,
+                    balance_before: currentBalance,
+                    balance_after: newBalance,
+                    transaction_type: "top-up",
+                    transaction_date: new Date(),
+                });
+
+                document.getElementById("topup-form").reset();
+            } catch (error) {
+                console.error("Error updating balance:", error);
+                alert("Failed to top-up user balance.");
+            }
+        });
+    </script>
+</body>
+</html>
