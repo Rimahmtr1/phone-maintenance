@@ -1,31 +1,49 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Owner Top-Up Panel</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Owner Login</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        #signInMessage {
+            display: none;
+            padding: 10px;
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+            margin-bottom: 15px;
+        }
+        .message-success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+    </style>
 </head>
 <body>
-  <h1>Owner Panel</h1>
+    <h2>Owner Login</h2>
+    
+    <!-- Display message -->
+    <div id="signInMessage"></div>
 
-  <!-- Login Form -->
-  <div id="loginSection">
-    <input type="email" id="email" placeholder="Email"><br>
-    <input type="password" id="password" placeholder="Password"><br>
-    <button id="loginBtn">Login</button>
-    <p id="loginStatus"></p>
-  </div>
+    <form id="loginForm">
+        <label for="email">Email:</label>
+        <input type="email" id="email" required><br><br>
 
-  <!-- Owner Panel -->
-  <div id="ownerPanel" style="display:none;">
-    <h3>Top Up User</h3>
-    <label for="userSelect">Select User:</label>
-    <select id="userSelect"></select>
-    <p>Balance: <span id="balanceDisplay">0</span></p>
+        <label for="password">Password:</label>
+        <input type="password" id="password" required><br><br>
 
-    <input type="number" id="topupAmount" placeholder="Enter amount" />
-    <button onclick="topupBalance()">Top Up</button>
-  </div>
+        <button type="submit" id="submitSignIn">Sign In</button>
+    </form>
 
-  <script type="module" src="Owner.js"></script>
+    <!-- Include the Owner.js script -->
+    <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-firestore.js"></script>
+    <script src="Owner.js"></script>
 </body>
 </html>
