@@ -1,8 +1,9 @@
+// Firebase Configuration
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.1.3/firebase-app.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.1.3/firebase-auth.js";
 import { getFirestore, collection, getDocs, query, where, orderBy } from "https://www.gstatic.com/firebasejs/9.1.3/firebase-firestore.js";
 
-// Firebase Config
+// Firebase Initialization
 const firebaseConfig = {
     apiKey: "AIzaSyCJsJsuMx1LT6SXZcCqdHa5wkueqXTTT4Q",
     authDomain: "phone-maintenance-18b38.firebaseapp.com",
@@ -17,13 +18,13 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth();
 
-// Format ISO date
+// Function to format dates
 function formatDate(iso) {
     const date = new Date(iso);
     return date.toLocaleDateString('en-US', { day: '2-digit', month: 'short', year: 'numeric' });
 }
 
-// Render individual transaction
+// Function to render each transaction
 function renderTransaction(tx) {
     const icon = tx.transaction_type === 'purchase' ? '🛒' : '💼';
     const color = tx.transaction_type === 'purchase' ? 'text-red-500' : 'text-green-500';
@@ -44,47 +45,50 @@ function renderTransaction(tx) {
     `;
 }
 
-// Load transactions for the signed-in user
+// Function to load transactions for the signed-in user
 async function loadUserTransactions(userId) {
     const container = document.getElementById('transaction-list');
-    const template = document.getElementById('transaction-template');
+    const noTransactionsMessage = document.getElementById('no-transactions');
 
     container.innerHTML = `<p class="text-gray-400">Loading...</p>`;
 
     try {
         const q = query(
             collection(db, "transactions"),
-            where("transactionid", "==", userId), // Fetch transactions where transactionid matches userId
-            orderBy("transaction_date", "desc")
+            where("transactionid", "==", userId), // Only get transactions matching the logged-in user's ID
+            orderBy("transaction_date", "desc")   // Order by transaction date, latest first
         );
         const snapshot = await getDocs(q);
 
         if (snapshot.empty) {
             container.innerHTML = `<p class="text-gray-500">No transactions found.</p>`;
+            noTransactionsMessage.classList.remove('hidden');  // Show message if no transactions
             return;
         }
 
-        container.innerHTML = ''; // Clear loading text
+        container.innerHTML = '';  // Clear loading message
+        noTransactionsMessage.classList.add('hidden');  // Hide message if transactions exist
 
         snapshot.forEach(doc => {
             const tx = doc.data();
             const html = renderTransaction(tx);
-            container.innerHTML += html;
+            container.innerHTML += html; // Append transaction to list
         });
-
     } catch (err) {
         console.error("Error loading transactions:", err);
         container.innerHTML = `<p class="text-red-500">Failed to load transactions.</p>`;
     }
 }
 
-// Check if user is logged in and load transactions
+// Check if the user is logged in and load their transactions
 onAuthStateChanged(auth, (user) => {
     if (user) {
         const userId = user.uid;
-        loadUserTransactions(userId);  // Load transactions only for the logged-in user
+        document.getElementById('auth-status').innerHTML = `<p class="text-green-500">Logged in as ${user.email}</p>`;
+        loadUserTransactions(userId);  // Load transactions for the logged-in user
     } else {
-        // If no user is logged in, display a message
-        document.getElementById('transaction-list').innerHTML = '<p class="text-gray-500">Please log in to see your transactions.</p>';
+        document.getElementById('auth-status').innerHTML = `<p class="text-red-500">Not logged in. Please log in to view transactions.</p>`;
+        document.getElementById('transaction-list').innerHTML = ''; // Clear transactions if not logged in
+        document.getElementById('no-transactions').classList.add('hidden');
     }
 });
