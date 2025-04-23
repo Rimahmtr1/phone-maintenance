@@ -4,29 +4,28 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>User Transactions</title>
+
+    <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-firestore.js"></script>
-    <!-- Tailwind CSS CDN (for development only) -->
+
+    <!-- Tailwind CSS -->
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.1.2/dist/tailwind.min.css" rel="stylesheet">
 </head>
-<body class="bg-gray-100">
+<body class="bg-gray-100 min-h-screen">
 
-    <!-- Navigation or Header -->
     <header class="bg-gray-800 text-white p-4">
         <h1 class="text-2xl font-semibold">User Transactions</h1>
-        <div id="auth-status"></div>
+        <div id="auth-status" class="mt-1"></div>
     </header>
 
-    <!-- Transaction List Section -->
-    <main class="container mx-auto mt-8">
+    <main class="container mx-auto mt-8 px-4">
         <div id="transaction-list" class="space-y-4"></div>
-
-        <!-- No transactions or login message -->
-        <p id="no-transactions" class="text-gray-500 text-center hidden">Please log in to view your transactions.</p>
+        <p id="no-transactions" class="text-gray-500 text-center hidden mt-4">Please log in to view your transactions.</p>
     </main>
 
-    <!-- External Script -->
+    <!-- Your custom script -->
     <script src="transaction.js" type="module"></script>
 
 </body>
