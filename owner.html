@@ -5,20 +5,27 @@
   <title>Owner Top-Up Panel</title>
 </head>
 <body>
-  <h1>Owner Top-Up Panel</h1>
+  <h1>Owner Panel</h1>
 
-  <div id="authStatus">Checking authentication...</div>
+  <!-- Login Form -->
+  <div id="loginSection">
+    <input type="email" id="email" placeholder="Email"><br>
+    <input type="password" id="password" placeholder="Password"><br>
+    <button id="loginBtn">Login</button>
+    <p id="loginStatus"></p>
+  </div>
 
+  <!-- Owner Panel -->
   <div id="ownerPanel" style="display:none;">
+    <h3>Top Up User</h3>
     <label for="userSelect">Select User:</label>
     <select id="userSelect"></select>
     <p>Balance: <span id="balanceDisplay">0</span></p>
 
-    <input type="number" id="topupAmount" placeholder="Enter amount to top up" />
+    <input type="number" id="topupAmount" placeholder="Enter amount" />
     <button onclick="topupBalance()">Top Up</button>
   </div>
 
-  <!-- Load Firebase logic -->
   <script type="module" src="Owner.js"></script>
 </body>
 </html>
