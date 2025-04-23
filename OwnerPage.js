@@ -102,7 +102,7 @@ userEmailSelect.addEventListener('change', async () => {
 // Event listener for updating the balance
 updateBalanceBtn.addEventListener('click', async () => {
     const selectedUID = userEmailSelect.value;
-    const newBalance = newBalanceInput.value;
+    const newBalance = newBalanceInput.value+userBalanceInput;
 
     if (!selectedUID || !newBalance) {
         messageDiv.textContent = "Please select a user and enter a new balance.";
