@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Owner Top-Up Panel</title>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js"></script>
+</head>
+<body>
+  <h1>Owner Top-Up Panel</h1>
+
+  <div id="authStatus">Checking authentication...</div>
+
+  <div id="ownerPanel" style="display:none;">
+    <label for="userSelect">Select User:</label>
+    <select id="userSelect"></select>
+    <p>Balance: <span id="balanceDisplay">0</span></p>
+
+    <input type="number" id="topupAmount" placeholder="Enter amount to top up" />
+    <button onclick="topupBalance()">Top Up</button>
+  </div>
+
+  <!-- Link to your JS logic -->
+  <script type="module" src="Owner.js"></script>
+</body>
+</html>
