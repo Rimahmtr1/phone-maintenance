@@ -45,7 +45,7 @@ function renderTransaction(tx) {
     `;
 }
 
-// Function to load transactions for the signed-in user
+// Function to load transaction details for the signed-in user
 async function loadUserTransactions(userId) {
     const container = document.getElementById('transaction-list');
     const noTransactionsMessage = document.getElementById('no-transactions');
@@ -53,26 +53,30 @@ async function loadUserTransactions(userId) {
     container.innerHTML = `<p class="text-gray-400">Loading...</p>`;
 
     try {
+        // Query the Firestore "transactions" collection for documents where "transactionid" matches the user's ID
         const q = query(
             collection(db, "transactions"),
-            where("transactionid", "==", userId), // Only get transactions matching the logged-in user's ID
-            orderBy("transaction_date", "desc")   // Order by transaction date, latest first
+            where("transactionid", "==", userId), // Fetch transactions where transactionid equals user's UID
+            orderBy("transaction_date", "desc")   // Order by transaction date, most recent first
         );
         const snapshot = await getDocs(q);
 
+        // Check if there are no transactions
         if (snapshot.empty) {
             container.innerHTML = `<p class="text-gray-500">No transactions found.</p>`;
             noTransactionsMessage.classList.remove('hidden');  // Show message if no transactions
             return;
         }
 
-        container.innerHTML = '';  // Clear loading message
-        noTransactionsMessage.classList.add('hidden');  // Hide message if transactions exist
+        // Clear the "Loading..." message and hide "no transactions" message
+        container.innerHTML = '';
+        noTransactionsMessage.classList.add('hidden'); 
 
+        // Loop through all documents in the snapshot and render each transaction
         snapshot.forEach(doc => {
             const tx = doc.data();
             const html = renderTransaction(tx);
-            container.innerHTML += html; // Append transaction to list
+            container.innerHTML += html; // Append transaction details to the page
         });
     } catch (err) {
         console.error("Error loading transactions:", err);
@@ -83,7 +87,7 @@ async function loadUserTransactions(userId) {
 // Check if the user is logged in and load their transactions
 onAuthStateChanged(auth, (user) => {
     if (user) {
-        const userId = user.uid;
+        const userId = user.uid;  // Get the logged-in user's UID
         document.getElementById('auth-status').innerHTML = `<p class="text-green-500">Logged in as ${user.email}</p>`;
         loadUserTransactions(userId);  // Load transactions for the logged-in user
     } else {
