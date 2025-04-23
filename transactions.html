@@ -1,32 +1,35 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>User Transactions</title>
-
-    <!-- Firebase SDKs -->
-    <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-auth.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-firestore.js"></script>
-
-    <!-- Tailwind CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.1.2/dist/tailwind.min.css" rel="stylesheet">
+  <meta charset="UTF-8">
+  <title>User Transactions</title>
+  <script type="module" src="transaction.js" defer></script>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 </head>
-<body class="bg-gray-100 min-h-screen">
+<body class="bg-gray-100 p-6">
+  <div class="max-w-4xl mx-auto space-y-6">
+    <div id="auth-status" class="text-lg font-semibold"></div>
 
-    <header class="bg-gray-800 text-white p-4">
-        <h1 class="text-2xl font-semibold">User Transactions</h1>
-        <div id="auth-status" class="mt-1"></div>
-    </header>
+    <div class="bg-white p-4 rounded-2xl shadow space-y-4">
+      <h2 class="text-xl font-bold">Filter Transactions</h2>
+      <div class="flex flex-wrap items-center gap-4">
+        <label class="flex flex-col">
+          <span class="text-sm text-gray-600">Start Date</span>
+          <input type="date" id="start-date" class="border border-gray-300 rounded p-2">
+        </label>
+        <label class="flex flex-col">
+          <span class="text-sm text-gray-600">End Date</span>
+          <input type="date" id="end-date" class="border border-gray-300 rounded p-2">
+        </label>
+        <button id="filter-button" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+          Apply Filter
+        </button>
+      </div>
+    </div>
 
-    <main class="container mx-auto mt-8 px-4">
-        <div id="transaction-list" class="space-y-4"></div>
-        <p id="no-transactions" class="text-gray-500 text-center hidden mt-4">Please log in to view your transactions.</p>
-    </main>
+    <div id="no-transactions" class="hidden text-gray-500 text-center">No transactions to show.</div>
 
-    <!-- Your custom script -->
-    <script src="transaction.js" type="module"></script>
-
+    <div id="transaction-list" class="space-y-4"></div>
+  </div>
 </body>
 </html>
