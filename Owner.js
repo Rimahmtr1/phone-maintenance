@@ -51,7 +51,7 @@ signInButton.addEventListener('click', (event) => {
                 localStorage.setItem('loggedUserId', user.uid);
                 
                 // Show success message
-                showMessage('Login successful! Welcome, Owner.', 'signInMessage');
+                showMessage('Login successful! Welcome, Owner....', 'signInMessage');
                 
                 // Redirect to the Owner's page
                 window.location.href = "ownerPage.html";  // Redirect to the owner panel page
