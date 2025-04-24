@@ -2,48 +2,92 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Your Item Code</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Your ALFA Recharge Code</title>
   <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
     body {
-      font-family: Arial, sans-serif;
-      background: #f8f9fa;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #e0f7fa, #f1f8e9);
       display: flex;
       justify-content: center;
       align-items: center;
       height: 100vh;
+      padding: 20px;
     }
+
     #itemCodeBox {
-      background-color: #fff;
-      padding: 30px;
-      border: 2px solid #4caf50;
-      border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      background-color: #ffffff;
+      padding: 40px;
+      border-radius: 15px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
       text-align: center;
+      max-width: 400px;
+      width: 100%;
     }
+
+    #itemCodeBox h1 {
+      font-size: 26px;
+      color: #388e3c;
+      margin-bottom: 20px;
+    }
+
     #itemCodeText {
-      font-size: 24px;
+      font-size: 28px;
       font-weight: bold;
-      color: #4caf50;
+      color: #2e7d32;
+      background-color: #f1f8e9;
+      padding: 10px 20px;
+      border-radius: 8px;
+      margin-bottom: 25px;
+      display: inline-block;
+    }
+
+    .instructions {
+      font-size: 16px;
+      color: #444;
+      line-height: 1.6;
+      text-align: left;
+    }
+
+    .instructions strong {
+      color: #1b5e20;
+    }
+
+    @media (max-width: 480px) {
+      #itemCodeBox {
+        padding: 25px;
+      }
+
+      #itemCodeText {
+        font-size: 22px;
+      }
     }
   </style>
 </head>
 <body>
   <div id="itemCodeBox">
-    <p>Your item code is:</p>
+    <h1>Your Touch Recharge Code</h1>
     <div id="itemCodeText">Loading...</div>
+    <div class="instructions">
+      <p><strong>How to charge:</strong><br>
+      Dial <strong>*200*CODE#</strong> then press call.</p>
+      <p><strong>To confirm recharge:</strong><br>
+      - Check SMS from Touch<br>
+      - Or dial <strong>*220#</strong> to verify balance.</p>
+    </div>
   </div>
 
-  <!-- ✅ Put script at the END of body -->
   <script>
-    document.addEventListener("DOMContentLoaded", function () {
-      const urlParams = new URLSearchParams(window.location.search);
-      const code = urlParams.get('code');
-      const codeElement = document.getElementById('itemCodeText');
-      if (code && codeElement) {
-        codeElement.textContent = code;
-      } else {
-        codeElement.textContent = 'No code available';
-      }
+    document.addEventListener("DOMContentLoaded", () => {
+      const code = new URLSearchParams(window.location.search).get("code");
+      const codeElement = document.getElementById("itemCodeText");
+      codeElement.textContent = code ? code : "No code found.";
     });
   </script>
 </body>
