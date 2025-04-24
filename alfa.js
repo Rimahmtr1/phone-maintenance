@@ -96,7 +96,15 @@ async function handlePurchase(userId, category, price) {
     const newBalance = balance - price;
     await updateDoc(userRef, { balance: newBalance });
 
-    await saveTransaction(userId, itemData["item-code"], price, "purchase", balance, newBalance);
+    await saveTransaction(
+      userId,
+      itemData["item-code"],
+      price,
+      "purchase",
+      balance,
+      newBalance,
+      category // ✅ added category as category_type
+    );
 
     window.location.href = `alfa-buy.html?code=${encodeURIComponent(itemData["item-code"])}&category=${encodeURIComponent(category)}`;
   } catch (err) {
@@ -127,15 +135,21 @@ async function getAvailableItem(userId, category) {
   return docData.data();
 }
 
-async function saveTransaction(userId, code, amount, type, before, after) {
+async function saveTransaction(userId, code, amount, type, before, after, category) {
   const ref = doc(collection(db, "transactions"));
-  await setDoc(ref, {
+
+  const transactionData = {
     transactionid: userId,
     secretcode: code,
     transaction_date: new Date().toISOString(),
     amount,
     transaction_type: type,
     balance_before: before,
-    balance_after: after
-  });
+    balance_after: after,
+    category_type: category // ✅ category_type included
+  };
+
+  console.log("Saving ALFA transaction:", transactionData);
+
+  await setDoc(ref, transactionData);
 }
