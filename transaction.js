@@ -29,22 +29,37 @@ function renderTransaction(tx) {
   const color = tx.transaction_type === 'purchase' ? 'text-red-500' : 'text-green-500';
   const sign = tx.transaction_type === 'purchase' ? '-' : '+';
 
-  // Link to tran.html with query parameters
-  return `
-    <a href="tran.html?transactionid=${tx.transactionid}&category_type=${tx.category_type}" class="block bg-white p-4 rounded-2xl shadow flex justify-between items-center">
-      <div class="flex items-center gap-4">
-        <div class="text-2xl">${icon}</div>
-        <div>
-          <h3 class="font-semibold">Secret Code: ${tx.secretcode}</h3>
-          <p class="text-sm text-gray-500">${formatDate(tx.transaction_date)} · ${tx.transaction_type}</p>
-          <p class="text-xs text-gray-400">Balance: ${tx.balance_before} ➜ ${tx.balance_after}</p>
-          <!-- Display the category -->
-          <p class="text-xs text-gray-500">Category: ${tx.category_type}</p>
-        </div>
+  // Create the transaction div
+  const transactionDiv = document.createElement('div');
+  transactionDiv.classList.add('block', 'bg-white', 'p-4', 'rounded-2xl', 'shadow', 'flex', 'justify-between', 'items-center');
+  
+  // Add the content inside the div
+  transactionDiv.innerHTML = `
+    <div class="flex items-center gap-4">
+      <div class="text-2xl">${icon}</div>
+      <div>
+        <h3 class="font-semibold">Secret Code: ${tx.secretcode}</h3>
+        <p class="text-sm text-gray-500">${formatDate(tx.transaction_date)} · ${tx.transaction_type}</p>
+        <p class="text-xs text-gray-400">Balance: ${tx.balance_before} ➜ ${tx.balance_after}</p>
+        <p class="text-xs text-gray-500">Category: ${tx.category_type}</p>
       </div>
-      <div class="${color} font-semibold">${sign} ${tx.amount.toLocaleString()}</div>
-    </a>
+    </div>
+    <div class="${color} font-semibold">${sign} ${tx.amount.toLocaleString()}</div>
   `;
+
+  // Add an event listener to open an alert with transaction details
+  transactionDiv.addEventListener('click', () => {
+    alert(`Transaction Details:
+Secret Code: ${tx.secretcode}
+Date: ${formatDate(tx.transaction_date)}
+Type: ${tx.transaction_type}
+Balance Before: ${tx.balance_before}
+Balance After: ${tx.balance_after}
+Amount: ${sign} ${tx.amount.toLocaleString()}
+Category: ${tx.category_type}`);
+  });
+
+  return transactionDiv;
 }
 
 // Load transactions for the user
@@ -90,7 +105,7 @@ async function loadUserTransactions(userId, startDate = null, endDate = null) {
     noTransactionsMessage.classList.add('hidden');
 
     results.forEach(tx => {
-      container.innerHTML += renderTransaction(tx);
+      container.appendChild(renderTransaction(tx));
     });
 
   } catch (err) {
