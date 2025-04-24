@@ -136,9 +136,10 @@ async function getAvailableItem(userId, category) {
 }
 
 async function saveTransaction(userId, code, amount, type, before, after, category) {
-  const ref = doc(collection(db, "transactions"));
+  console.log("Saving transaction with category_type:", category); // ✅ check if value exists
 
-  const transactionData = {
+  const ref = doc(collection(db, "transactions"));
+  await setDoc(ref, {
     transactionid: userId,
     secretcode: code,
     transaction_date: new Date().toISOString(),
@@ -146,10 +147,7 @@ async function saveTransaction(userId, code, amount, type, before, after, catego
     transaction_type: type,
     balance_before: before,
     balance_after: after,
-    category_type: category // ✅ category_type included
-  };
-
-  console.log("Saving ALFA transaction:", transactionData);
-
-  await setDoc(ref, transactionData);
+    category_type: category
+  });
 }
+
