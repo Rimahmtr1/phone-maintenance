@@ -4,24 +4,26 @@ import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/
 import { getFirestore, collection, getDocs, query, where, orderBy } from "https://www.gstatic.com/firebasejs/9.1.3/firebase-firestore.js";
 
 const firebaseConfig = {
-    apiKey: "AIzaSyCJsJsuMx1LT6SXZcCqdHa5wkueqXTTT4Q",
-    authDomain: "phone-maintenance-18b38.firebaseapp.com",
-    projectId: "phone-maintenance-18b38",
-    storageBucket: "phone-maintenance-18b38.appspot.com",
-    messagingSenderId: "881648450762",
-    appId: "1:881648450762:web:b17fef83d6015c65a40833",
-    measurementId: "G-0MD0GJJ0E2"
+  apiKey: "AIzaSyCJsJsuMx1LT6SXZcCqdHa5wkueqXTTT4Q",
+  authDomain: "phone-maintenance-18b38.firebaseapp.com",
+  projectId: "phone-maintenance-18b38",
+  storageBucket: "phone-maintenance-18b38.appspot.com",
+  messagingSenderId: "881648450762",
+  appId: "1:881648450762:web:b17fef83d6015c65a40833",
+  measurementId: "G-0MD0GJJ0E2"
 };
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth();
 
+// Helper function to format the date
 function formatDate(iso) {
   const date = new Date(iso);
   return date.toLocaleDateString('en-US', { day: '2-digit', month: 'short', year: 'numeric' });
 }
 
+// Render individual transaction
 function renderTransaction(tx) {
   const icon = tx.transaction_type === 'purchase' ? '🛒' : '💼';
   const color = tx.transaction_type === 'purchase' ? 'text-red-500' : 'text-green-500';
@@ -45,6 +47,7 @@ function renderTransaction(tx) {
   `;
 }
 
+// Load transactions for the user
 async function loadUserTransactions(userId, startDate = null, endDate = null) {
   const container = document.getElementById('transaction-list');
   const noTransactionsMessage = document.getElementById('no-transactions');
@@ -102,12 +105,14 @@ async function loadUserTransactions(userId, startDate = null, endDate = null) {
   }
 }
 
+// Check if the user is logged in and load transactions
 onAuthStateChanged(auth, (user) => {
   const status = document.getElementById('auth-status');
   if (user) {
     status.innerHTML = `<p class="text-green-500">Logged in as ${user.email}</p>`;
     loadUserTransactions(user.uid);
 
+    // Filter transactions by date
     document.getElementById('filter-button').addEventListener('click', () => {
       const start = document.getElementById('start-date').value;
       const end = document.getElementById('end-date').value;
