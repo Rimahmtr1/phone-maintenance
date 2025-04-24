@@ -27,18 +27,21 @@ function renderTransaction(tx) {
   const color = tx.transaction_type === 'purchase' ? 'text-red-500' : 'text-green-500';
   const sign = tx.transaction_type === 'purchase' ? '-' : '+';
 
+  // Link to tran.html with query parameters
   return `
-    <div class="bg-white p-4 rounded-2xl shadow flex justify-between items-center">
+    <a href="tran.html?transactionid=${tx.transactionid}&category_type=${tx.category_type}" class="block bg-white p-4 rounded-2xl shadow flex justify-between items-center">
       <div class="flex items-center gap-4">
         <div class="text-2xl">${icon}</div>
         <div>
           <h3 class="font-semibold">Secret Code: ${tx.secretcode}</h3>
           <p class="text-sm text-gray-500">${formatDate(tx.transaction_date)} · ${tx.transaction_type}</p>
           <p class="text-xs text-gray-400">Balance: ${tx.balance_before} ➜ ${tx.balance_after}</p>
+          <!-- Display the category -->
+          <p class="text-xs text-gray-500">Category: ${tx.category_type}</p>
         </div>
       </div>
       <div class="${color} font-semibold">${sign} ${tx.amount.toLocaleString()}</div>
-    </div>
+    </a>
   `;
 }
 
