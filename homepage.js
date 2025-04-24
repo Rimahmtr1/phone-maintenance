@@ -53,7 +53,7 @@ function fetchUserData(userId) {
         })
         .catch((error) => {
             console.error('Error getting document:', error);
-            showError('Failed to load profile data.');
+            showError('Failed to load profile data. please login then come back.');
         });
 }
 
