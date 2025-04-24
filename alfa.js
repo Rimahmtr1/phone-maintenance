@@ -96,9 +96,10 @@ async function handlePurchase(userId, category, price) {
     const newBalance = balance - price;
     await updateDoc(userRef, { balance: newBalance });
 
+    // Save transaction including category_type
     await saveTransaction(userId, itemData["item-code"], price, "purchase", balance, newBalance, category);
 
-    window.location.href = alfa-buy.html?code=${encodeURIComponent(itemData["item-code"])}&category=${encodeURIComponent(category)};
+    window.location.href = `alfa-buy.html?code=${encodeURIComponent(itemData["item-code"])}&category=${encodeURIComponent(category)}`;
   } catch (err) {
     alert("Error during purchase: " + err.message);
   }
@@ -137,6 +138,6 @@ async function saveTransaction(userId, code, amount, type, before, after, catego
     transaction_type: type,
     balance_before: before,
     balance_after: after,
-    category_type:category
+    category_type: category // Add category_type to the transaction
   });
 }
