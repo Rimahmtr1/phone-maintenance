@@ -29,12 +29,13 @@ function renderTransaction(tx) {
   const color = tx.transaction_type === 'purchase' ? 'text-red-500' : 'text-green-500';
   const sign = tx.transaction_type === 'purchase' ? '-' : '+';
 
-  // Create the transaction div
-  const transactionDiv = document.createElement('div');
-  transactionDiv.classList.add('block', 'bg-white', 'p-4', 'rounded-2xl', 'shadow', 'flex', 'justify-between', 'items-center');
+  // Create the transaction div as a clickable link
+  const transactionLink = document.createElement('a');
+  transactionLink.href = '#';  // Prevent actual navigation
+  transactionLink.classList.add('block', 'bg-white', 'p-4', 'rounded-2xl', 'shadow', 'flex', 'justify-between', 'items-center');
   
-  // Add the content inside the div
-  transactionDiv.innerHTML = `
+  // Add the content inside the link
+  transactionLink.innerHTML = `
     <div class="flex items-center gap-4">
       <div class="text-2xl">${icon}</div>
       <div>
@@ -48,8 +49,9 @@ function renderTransaction(tx) {
   `;
 
   // Add an event listener to open an alert with transaction details
-  transactionDiv.addEventListener('click', () => {
-    alert(`Transaction Details:
+  transactionLink.addEventListener('click', () => {
+    alert(`
+Transaction Details:
 Secret Code: ${tx.secretcode}
 Date: ${formatDate(tx.transaction_date)}
 Type: ${tx.transaction_type}
@@ -59,7 +61,7 @@ Amount: ${sign} ${tx.amount.toLocaleString()}
 Category: ${tx.category_type}`);
   });
 
-  return transactionDiv;
+  return transactionLink;
 }
 
 // Load transactions for the user
