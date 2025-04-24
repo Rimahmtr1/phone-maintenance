@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Your Item Code</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f8f9fa;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    #itemCodeBox {
+      background-color: #fff;
+      padding: 30px;
+      border: 2px solid #4caf50;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      text-align: center;
+    }
+    #itemCodeText {
+      font-size: 24px;
+      font-weight: bold;
+      color: #4caf50;
+    }
+  </style>
+</head>
+<body>
+  <div id="itemCodeBox">
+    <p>Your item code is:</p>
+    <div id="itemCodeText">Loading...</div>
+  </div>
+
+  <!-- ✅ Put script at the END of body -->
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const urlParams = new URLSearchParams(window.location.search);
+      const code = urlParams.get('code');
+      const codeElement = document.getElementById('itemCodeText');
+      if (code && codeElement) {
+        codeElement.textContent = code;
+      } else {
+        codeElement.textContent = 'No code available';
+      }
+    });
+  </script>
+</body>
+</html>
