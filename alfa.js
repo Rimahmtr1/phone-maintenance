@@ -96,10 +96,9 @@ async function handlePurchase(userId, category, price) {
     const newBalance = balance - price;
     await updateDoc(userRef, { balance: newBalance });
 
-    // Pass category to saveTransaction function
-    await saveTransaction(userId, itemData["item-code"], price, "purchase", balance, newBalance, category);
+    await saveTransaction(userId, itemData["item-code"], price, "purchase", balance, newBalance, selectedCategory);
 
-    window.location.href = `alfa-buy.html?code=${encodeURIComponent(itemData["item-code"])}&category=${encodeURIComponent(category)}`;
+    window.location.href = alfa-buy.html?code=${encodeURIComponent(itemData["item-code"])}&category=${encodeURIComponent(category)};
   } catch (err) {
     alert("Error during purchase: " + err.message);
   }
@@ -128,7 +127,6 @@ async function getAvailableItem(userId, category) {
   return docData.data();
 }
 
-// Update saveTransaction to accept category_type and include it in the transaction
 async function saveTransaction(userId, code, amount, type, before, after, category) {
   const ref = doc(collection(db, "transactions"));
   await setDoc(ref, {
@@ -139,6 +137,6 @@ async function saveTransaction(userId, code, amount, type, before, after, catego
     transaction_type: type,
     balance_before: before,
     balance_after: after,
-    category_type: category // Add category_type to the transaction
+    category_type:category
   });
 }
