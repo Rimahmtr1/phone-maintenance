@@ -96,7 +96,7 @@ async function handlePurchase(userId, category, price) {
     const newBalance = balance - price;
     await updateDoc(userRef, { balance: newBalance });
 
-    await saveTransaction(userId, itemData["item-code"], price, "purchase", balance, newBalance, selectedCategory);
+    await saveTransaction(userId, itemData["item-code"], price, "purchase", balance, newBalance, category);
 
     window.location.href = alfa-buy.html?code=${encodeURIComponent(itemData["item-code"])}&category=${encodeURIComponent(category)};
   } catch (err) {
