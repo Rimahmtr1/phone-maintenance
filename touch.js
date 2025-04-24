@@ -30,25 +30,32 @@ const auth = getAuth();
 let selectedCategory = null;
 
 window.addEventListener("DOMContentLoaded", () => {
-  const openAlertBtn = document.getElementById("openAlertBtn");
-  const alertBox = document.getElementById("customAlert");
+  const openAlertBtn1 = document.getElementById("openAlertBtn");
+  const openAlertBtn2 = document.getElementById("openAlertBtn2");
+  const alertBox1 = document.getElementById("customAlert");
+  const alertBox2 = document.getElementById("Alert4.5");
   const closeAlertBtn = document.getElementById("closeAlertBtn");
   const buyBtn = document.getElementById("buyBtn");
 
-  openAlertBtn.addEventListener("click", (event) => {
-    selectedCategory = event.target.dataset.category || event.currentTarget.dataset.category;
-    alertBox.style.display = "flex";
+  openAlertBtn1?.addEventListener("click", (event) => {
+    const selectedCategory = event.target.dataset.category || event.currentTarget.dataset.category;
+    alertBox1.style.display = "flex";
+    console.log("Category 1 selected:", selectedCategory);
   });
-  window.addEventListener("DOMContentLoaded", () => {
-  const openAlertBtn = document.getElementById("openAlertBtn2");
-  const alertBox = document.getElementById("Alert4.5");
-  const closeAlertBtn = document.getElementById("closeAlertBtn");
-  const buyBtn = document.getElementById("buyBtn");
 
-  openAlertBtn2.addEventListener("click", (event) => {
-    selectedCategory = event.target.dataset.category || event.currentTarget.dataset.category;
-    alertBox.style.display = "flex";
+  openAlertBtn2?.addEventListener("click", (event) => {
+    const selectedCategory = event.target.dataset.category || event.currentTarget.dataset.category;
+    alertBox2.style.display = "flex";
+    console.log("Category 2 selected:", selectedCategory);
   });
+
+  // Optional: add close functionality
+  closeAlertBtn?.addEventListener("click", () => {
+    alertBox1.style.display = "none";
+    alertBox2.style.display = "none";
+  });
+});
+
 
   closeAlertBtn.addEventListener("click", () => {
     alertBox.style.display = "none";
