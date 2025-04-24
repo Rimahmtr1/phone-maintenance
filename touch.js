@@ -41,7 +41,7 @@ window.addEventListener("DOMContentLoaded", () => {
   });
   window.addEventListener("DOMContentLoaded", () => {
   const openAlertBtn = document.getElementById("openAlertBtn2");
-  const alertBox = document.getElementById("customAlert");
+  const alertBox = document.getElementById("Alert4.5");
   const closeAlertBtn = document.getElementById("closeAlertBtn");
   const buyBtn = document.getElementById("buyBtn");
 
