@@ -98,7 +98,15 @@ async function handlePurchase(userId, category, price) {
     const newBalance = balance - price;
     await updateDoc(userRef, { balance: newBalance });
 
-    await saveTransaction(userId, itemData["item-code"], price, "purchase", balance, newBalance,selectedCategory);
+    await saveTransaction(
+      userId,
+      itemData["item-code"],
+      price,
+      "purchase",
+      balance,
+      newBalance,
+      category // ✅ passing category to be saved as category_type
+    );
 
     window.location.href = `touch-buy.html?code=${encodeURIComponent(itemData["item-code"])}&category=${encodeURIComponent(category)}`;
   } catch (err) {
@@ -129,7 +137,7 @@ async function getAvailableItem(userId, category) {
   return docData.data();
 }
 
-async function saveTransaction(userId, code, amount, type, before, after,category) {
+async function saveTransaction(userId, code, amount, type, before, after, category) {
   const ref = doc(collection(db, "transactions"));
   await setDoc(ref, {
     transactionid: userId,
@@ -139,6 +147,6 @@ async function saveTransaction(userId, code, amount, type, before, after,categor
     transaction_type: type,
     balance_before: before,
     balance_after: after,
-    category_type:category
+    category_type: category // ✅ category_type added here
   });
 }
