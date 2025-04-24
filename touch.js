@@ -139,6 +139,6 @@ async function saveTransaction(userId, code, amount, type, before, after,categor
     transaction_type: type,
     balance_before: before,
     balance_after: after,
-    category_type:selectedCategory
+    category_type:category
   });
 }
