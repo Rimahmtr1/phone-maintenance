@@ -105,7 +105,7 @@ async function handlePurchase(userId, category, price) {
       "purchase",
       balance,
       newBalance,
-      category // ✅ category passed properly
+      category
     );
 
     window.location.href = `touch-buy.html?code=${encodeURIComponent(itemData["item-code"])}&category=${encodeURIComponent(category)}`;
@@ -139,7 +139,8 @@ async function getAvailableItem(userId, category) {
 
 async function saveTransaction(userId, code, amount, type, before, after, category) {
   const ref = doc(collection(db, "transactions"));
-  await setDoc(ref, {
+
+  const transactionData = {
     transactionid: userId,
     secretcode: code,
     transaction_date: new Date().toISOString(),
@@ -147,6 +148,10 @@ async function saveTransaction(userId, code, amount, type, before, after, catego
     transaction_type: type,
     balance_before: before,
     balance_after: after,
-    category_type: category // ✅ Properly saved here
-  });
+    category_type: category
+  };
+
+  console.log("Saving transaction:", transactionData);
+
+  await setDoc(ref, transactionData);
 }
