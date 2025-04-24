@@ -28,55 +28,59 @@ const db = getFirestore(app);
 const auth = getAuth();
 
 let selectedCategory = null;
+let selectedPrice = 0;
 
 window.addEventListener("DOMContentLoaded", () => {
   const openAlertBtn1 = document.getElementById("openAlertBtn");
   const openAlertBtn2 = document.getElementById("openAlertBtn2");
   const alertBox1 = document.getElementById("customAlert");
   const alertBox2 = document.getElementById("Alert4.5");
-  const closeAlertBtn = document.getElementById("closeAlertBtn");
-  const buyBtn = document.getElementById("buyBtn");
+  const closeAlertBtn1 = document.getElementById("closeAlertBtn1");
+  const closeAlertBtn2 = document.getElementById("closeAlertBtn2");
+  const buyBtn1 = document.getElementById("buyBtn1");
+  const buyBtn2 = document.getElementById("buyBtn2");
 
   openAlertBtn1?.addEventListener("click", (event) => {
-    const selectedCategory = event.target.dataset.category || event.currentTarget.dataset.category;
+    selectedCategory = event.currentTarget.dataset.category;
+    selectedPrice = 800000;
     alertBox1.style.display = "flex";
     console.log("Category 1 selected:", selectedCategory);
   });
 
   openAlertBtn2?.addEventListener("click", (event) => {
-    const selectedCategory = event.target.dataset.category || event.currentTarget.dataset.category;
+    selectedCategory = event.currentTarget.dataset.category;
+    selectedPrice = 500000;
     alertBox2.style.display = "flex";
     console.log("Category 2 selected:", selectedCategory);
   });
 
-  // Optional: add close functionality
-  closeAlertBtn?.addEventListener("click", () => {
+  closeAlertBtn1?.addEventListener("click", () => {
     alertBox1.style.display = "none";
+  });
+
+  closeAlertBtn2?.addEventListener("click", () => {
     alertBox2.style.display = "none";
   });
+
+  buyBtn1?.addEventListener("click", () => handleBuy());
+  buyBtn2?.addEventListener("click", () => handleBuy());
 });
 
+async function handleBuy() {
+  if (!selectedCategory || !selectedPrice) {
+    return alert("No category selected.");
+  }
 
-  closeAlertBtn.addEventListener("click", () => {
-    alertBox.style.display = "none";
-  });
+  const confirmBuy = confirm("Are you sure you want to buy this item?");
+  if (!confirmBuy) return;
 
-  buyBtn.addEventListener("click", async () => {
-    if (!selectedCategory) {
-      return alert("No category selected.");
-    }
+  const userId = localStorage.getItem("loggedUserId");
+  if (!userId) return alert("Please log in to proceed.");
 
-    const confirmBuy = confirm("Are you sure you want to buy this item?");
-    if (!confirmBuy) return;
+  await handlePurchase(userId, selectedCategory, selectedPrice);
+}
 
-    const userId = localStorage.getItem("loggedUserId");
-    if (!userId) return alert("Please log in to proceed.");
-
-    await handlePurchase(userId, selectedCategory);
-  });
-});
-
-async function handlePurchase(userId, category) {
+async function handlePurchase(userId, category, price) {
   try {
     const userRef = doc(db, "users", userId);
     const userSnap = await getDoc(userRef);
@@ -86,15 +90,15 @@ async function handlePurchase(userId, category) {
     const userData = userSnap.data();
     const balance = userData.balance || 0;
 
-    if (balance < 800000) return alert("Insufficient balance.");
+    if (balance < price) return alert("Insufficient balance.");
 
     const itemData = await getAvailableItem(userId, category);
     if (!itemData) return;
 
-    const newBalance = balance - 800000;
+    const newBalance = balance - price;
     await updateDoc(userRef, { balance: newBalance });
 
-    await saveTransaction(userId, itemData["item-code"], 800000, "purchase", balance, newBalance);
+    await saveTransaction(userId, itemData["item-code"], price, "purchase", balance, newBalance);
 
     window.location.href = `touch-buy.html?code=${encodeURIComponent(itemData["item-code"])}&category=${encodeURIComponent(category)}`;
   } catch (err) {
