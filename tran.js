@@ -1,6 +1,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.1.3/firebase-app.js";
 import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/9.1.3/firebase-firestore.js";
 
+// Firebase configuration
 const firebaseConfig = {
     apiKey: "AIzaSyCJsJsuMx1LT6SXZcCqdHa5wkueqXTTT4Q",
     authDomain: "phone-maintenance-18b38.firebaseapp.com",
@@ -14,7 +15,8 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-function getTransactionDetails(transactionId, categoryType) {
+function getTransactionDetails(transactionId) {
+  // Fetch the transaction document using the transaction ID
   const transactionRef = doc(db, "transactions", transactionId);
   getDoc(transactionRef).then(docSnap => {
     if (docSnap.exists()) {
@@ -27,6 +29,7 @@ function getTransactionDetails(transactionId, categoryType) {
 }
 
 function displayTransaction(tx) {
+  // Hide the loading text and display the transaction details
   document.getElementById('loading').style.display = 'none';
 
   const transactionDetails = `
@@ -45,11 +48,11 @@ function displayTransaction(tx) {
 
 window.onload = () => {
   const params = new URLSearchParams(window.location.search);
-  const transactionId = params.get('transactionid');
-  const categoryType = params.get('category_type');
+  const transactionId = params.get('transactionid'); // Get the transaction ID from the URL query string
   
-  if (transactionId && categoryType) {
-    getTransactionDetails(transactionId, categoryType);
+  if (transactionId) {
+    // Fetch and display the transaction details
+    getTransactionDetails(transactionId);
   } else {
     document.getElementById('transaction-details').innerHTML = `<p class="text-red-500">Invalid transaction data.</p>`;
   }
