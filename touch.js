@@ -105,7 +105,7 @@ async function handlePurchase(userId, category, price) {
       "purchase",
       balance,
       newBalance,
-      category // ✅ passing category to be saved as category_type
+      category // ✅ category passed properly
     );
 
     window.location.href = `touch-buy.html?code=${encodeURIComponent(itemData["item-code"])}&category=${encodeURIComponent(category)}`;
@@ -147,6 +147,6 @@ async function saveTransaction(userId, code, amount, type, before, after, catego
     transaction_type: type,
     balance_before: before,
     balance_after: after,
-    category_type: category // ✅ category_type added here
+    category_type: category // ✅ Properly saved here
   });
 }
