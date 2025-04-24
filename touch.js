@@ -39,6 +39,16 @@ window.addEventListener("DOMContentLoaded", () => {
     selectedCategory = event.target.dataset.category || event.currentTarget.dataset.category;
     alertBox.style.display = "flex";
   });
+  window.addEventListener("DOMContentLoaded", () => {
+  const openAlertBtn = document.getElementById("openAlertBtn2");
+  const alertBox = document.getElementById("customAlert");
+  const closeAlertBtn = document.getElementById("closeAlertBtn");
+  const buyBtn = document.getElementById("buyBtn");
+
+  openAlertBtn2.addEventListener("click", (event) => {
+    selectedCategory = event.target.dataset.category || event.currentTarget.dataset.category;
+    alertBox.style.display = "flex";
+  });
 
   closeAlertBtn.addEventListener("click", () => {
     alertBox.style.display = "none";
