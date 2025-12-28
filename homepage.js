@@ -1,7 +1,7 @@
 // Import necessary Firebase modules
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.1.3/firebase-app.js";
-import { getAuth, signOut } from "https://www.gstatic.com/firebasejs/9.1.3/firebase-auth.js";
-import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/9.1.3/firebase-firestore.js";
+import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.1.3/firebase-auth.js";
+import { getFirestore, doc, getDocFromServer } from "https://www.gstatic.com/firebasejs/9.1.3/firebase-firestore.js";
 
 // Firebase configuration
 const firebaseConfig = {
@@ -16,45 +16,47 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
 const db = getFirestore(app);
-const auth = getAuth();
 
-// Check if user is logged in
-const userId = localStorage.getItem('loggedUserId');
+// 🔐 AUTH + FIRESTORE GUARD (BLOCK ACCESS)
+onAuthStateChanged(auth, async (user) => {
+    if (!user) {
+        // ❌ Not logged in
+        window.location.replace("login.html");
+        return;
+    }
 
-if (!userId) {
-    // Redirect to login page if no user is logged in
-    window.location.href = 'signup.html';
-} else {
-    // Fetch user data from Firestore
-    fetchUserData(userId);
-}
+    try {
+        const userRef = doc(db, "users", user.uid);
+        const snap = await getDocFromServer(userRef);
 
-// Fetch user profile data from Firestore
-function fetchUserData(userId) {
-    const userRef = doc(db, "users", userId);
+        if (!snap.exists()) {
+            // ❌ No Firestore profile
+            await signOut(auth);
+            window.location.replace("login.html");
+            return;
+        }
 
-    // Use the getDoc function to retrieve the document data
-    getDoc(userRef)
-        .then((docSnap) => {
-            if (docSnap.exists()) {
-                const userData = docSnap.data();
-                document.getElementById('firstName').textContent = userData.firstName;
-                document.getElementById('lastName').textContent = userData.lastName;
-                document.getElementById('email').textContent = userData.email;
-                document.getElementById('balance').textContent = userData.balance;
+        // ✅ User allowed
+        loadUserProfile(snap.data());
 
-                // Hide loading and show profile info
-                document.getElementById('loading').style.display = 'none';
-                document.getElementById('profileInfo').style.display = 'block';
-            } else {
-                showError('No profile data found');
-            }
-        })
-        .catch((error) => {
-            console.error('Error getting document:', error);
-            showError('Failed to load profile data. please login then come back.');
-        });
+    } catch (error) {
+        console.error("Access check failed:", error);
+        await signOut(auth);
+        window.location.replace("login.html");
+    }
+});
+
+// Load user profile data
+function loadUserProfile(userData) {
+    document.getElementById('firstName').textContent = userData.firstName || "";
+    document.getElementById('lastName').textContent = userData.lastName || "";
+    document.getElementById('email').textContent = userData.email || "";
+    document.getElementById('balance').textContent = userData.balance ?? 0;
+
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('profileInfo').style.display = 'block';
 }
 
 // Show error message
@@ -64,15 +66,17 @@ function showError(message) {
     document.getElementById('errorMessage').textContent = message;
 }
 
-// Log out functionality
-document.getElementById('logoutButton').addEventListener('click', () => {
-    signOut(auth).then(() => {
-        localStorage.removeItem('loggedUserId');
-        window.location.href = 'index.html'; // Redirect to sign-in page
-    }).catch((error) => {
-        console.error('Logout Error: ', error);
-    });
+// 🚪 LOGOUT
+document.getElementById('logoutButton').addEventListener('click', async () => {
+    try {
+        await signOut(auth);
+        window.location.replace("login.html");
+    } catch (error) {
+        console.error("Logout error:", error);
+    }
 });
-document.getElementById("returnButton").addEventListener("click", function () {
+
+// 🔙 RETURN BUTTON
+document.getElementById("returnButton").addEventListener("click", () => {
     window.location.href = "index.html";
-  });
+});
