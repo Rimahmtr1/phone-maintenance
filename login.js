@@ -15,54 +15,52 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
-const auth = getAuth();
+const auth = getAuth(app);
 
 // Show message function
 function showMessage(message, divId) {
-    var messageDiv = document.getElementById(divId);
+    const messageDiv = document.getElementById(divId);
     messageDiv.style.display = "block";
     messageDiv.innerHTML = message;
     messageDiv.style.opacity = 1;
-    setTimeout(function () {
+
+    setTimeout(() => {
         messageDiv.style.opacity = 0;
     }, 5000);
 }
 
 // Sign In Event Listener
 const signInButton = document.getElementById('submitSignIn');
-signInButton.addEventListener('click', (event) => {
+
+signInButton.addEventListener('click', async (event) => {
     event.preventDefault();
 
-    const email = document.getElementById('email').value;
+    const email = document.getElementById('email').value.trim();
     const password = document.getElementById('password').value;
 
-    // Firebase Authentication to sign the user in
-    signInWithEmailAndPassword(auth, email, password)
-        .then((userCredential) => {
-            const user = userCredential.user;
-            console.log('User signed in:', user);
+    try {
+        const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
 
-            // Save user data to localStorage for session persistence
-            localStorage.setItem('loggedUserId', user.uid);
-            
-            // Show success message
-            showMessage('Login successful!', 'signInMessage');
-            
-            // Redirect to the homepage
-            window.location.href = "homepage.html"; 
-        })
-        .catch((error) => {
-            const errorCode = error.code;
-            const errorMessage = error.message;
-            console.error('Error during sign-in:', errorCode, errorMessage);
+        console.log('User signed in:', user.uid);
 
-            // Display error message
-            if (errorCode === 'auth/wrong-password') {
-                showMessage('Incorrect password. Please try again.', 'signInMessage');
-            } else if (errorCode === 'auth/user-not-found') {
-                showMessage('No account found with this email. Please sign up.', 'signInMessage');
-            } else {
-                showMessage('Error logging in: ' + errorMessage, 'signInMessage');
-            }
-        });
+        // ✅ DO NOT store UID in localStorage
+        // Firebase Auth already persists the session securely
+
+        showMessage('Login successful!', 'signInMessage');
+
+        // Redirect to homepage
+        window.location.href = "homepage.html";
+
+    } catch (error) {
+        console.error('Error during sign-in:', error.code, error.message);
+
+        if (error.code === 'auth/wrong-password') {
+            showMessage('Incorrect password. Please try again.', 'signInMessage');
+        } else if (error.code === 'auth/user-not-found') {
+            showMessage('No account found with this email. Please sign up.', 'signInMessage');
+        } else {
+            showMessage('Error logging in: ' + error.message, 'signInMessage');
+        }
+    }
 });
