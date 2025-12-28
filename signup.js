@@ -17,60 +17,62 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
-const auth = getAuth();
+const auth = getAuth(app);
 
 // Show message function
 function showMessage(message, divId) {
-    var messageDiv = document.getElementById(divId);
+    const messageDiv = document.getElementById(divId);
     messageDiv.style.display = "block";
     messageDiv.innerHTML = message;
     messageDiv.style.opacity = 1;
-    setTimeout(function () {
+    setTimeout(() => {
         messageDiv.style.opacity = 0;
     }, 5000);
 }
 
 // Sign Up Event Listener
 const signUpButton = document.getElementById('submitSignUp');
-signUpButton.addEventListener('click', (event) => {
+signUpButton.addEventListener('click', async (event) => {
     event.preventDefault();
 
-    const firstName = document.getElementById('first-name').value;
-    const lastName = document.getElementById('last-name').value;
-    const email = document.getElementById('email').value;
+    const firstName = document.getElementById('first-name').value.trim();
+    const lastName = document.getElementById('last-name').value.trim();
+    const email = document.getElementById('email').value.trim();
     const password = document.getElementById('password').value;
-    const phone = document.getElementById('country-code').value + document.getElementById('phone').value;
-    
-    // Firebase Authentication to create the user
-    createUserWithEmailAndPassword(auth, email, password)
-        .then((userCredential) => {
-            const user = userCredential.user;
-            const userData = {
-                email: email,
-                firstName: firstName,
-                lastName: lastName,
-                phone: phone,
-                balance: 0
-            };
+    const phone = document.getElementById('country-code').value + document.getElementById('phone').value.trim();
 
-            // Save user data to Firestore
-            const userDocRef = doc(db, "users", user.uid);
-            setDoc(userDocRef, userData)
-                .then(() => {
-                    showMessage('Account created successfully!', 'signUpMessage');
-                    window.location.href = "login.html"; // Redirect to homepage after successful signup
-                })
-                .catch((error) => {
-                    console.error("Error writing document:", error);
-                    showMessage('Error saving data!', 'signUpMessage');
-                });
-        })
-        .catch((error) => {
-            const errorCode = error.code;
-            if (errorCode === 'auth/email-already-in-use') {
-                showMessage('Email is already in use!', 'signUpMessage');
-            } else {
-                showMessage('Error creating account!', 'signUpMessage');
-            }
-        });
+    try {
+        // Create user in Firebase Auth
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
+
+        // Prepare Firestore profile data
+        const userData = {
+            email: email,
+            firstName: firstName,
+            lastName: lastName,
+            phone: phone,
+            balance: 0
+        };
+
+        // Save user profile in Firestore
+        const userDocRef = doc(db, "users", user.uid);
+        await setDoc(userDocRef, userData);
+
+        showMessage('Account created successfully!', 'signUpMessage');
+        window.location.href = "login.html"; // Redirect to login page
+
+    } catch (error) {
+        console.error("Signup error:", error);
+
+        if (error.code === 'auth/email-already-in-use') {
+            showMessage('Email is already in use!', 'signUpMessage');
+        } else if (error.code === 'auth/invalid-email') {
+            showMessage('Invalid email format!', 'signUpMessage');
+        } else if (error.code === 'auth/weak-password') {
+            showMessage('Password is too weak!', 'signUpMessage');
+        } else {
+            showMessage('Error creating account!', 'signUpMessage');
+        }
+    }
 });
