@@ -1,13 +1,21 @@
-// =======================
-// FIREBASE CONFIG & INIT
-// =======================
+// ==========================================
+// 1. FIREBASE IMPORTS
+// ==========================================
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.1.3/firebase-app.js";
 import { 
     getAuth, 
     onAuthStateChanged, 
     signOut 
 } from "https://www.gstatic.com/firebasejs/9.1.3/firebase-auth.js";
+import { 
+    getFirestore, 
+    doc, 
+    onSnapshot 
+} from "https://www.gstatic.com/firebasejs/9.1.3/firebase-firestore.js";
 
+// ==========================================
+// 2. FIREBASE CONFIGURATION
+// ==========================================
 const firebaseConfig = {
     apiKey: "AIzaSyCJsJsuMx1LT6SXZcCqdHa5wkueqXTTT4Q",
     authDomain: "phone-maintenance-18b38.firebaseapp.com",
@@ -17,62 +25,87 @@ const firebaseConfig = {
     appId: "1:881648450762:web:b17fef83d6015c65a40833"
 };
 
+// Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
+const db = getFirestore(app);
 
-// =======================
-// DOM ELEMENTS
-// =======================
+// ==========================================
+// 3. DOM ELEMENTS
+// ==========================================
 const menuToggle = document.getElementById("menuToggle");
 const navMenu = document.getElementById("navMenu");
 const authButtons = document.getElementById("authButtons");
 const userSection = document.getElementById("userSection");
+const userBalance = document.getElementById("userBalance");
 const logoutBtn = document.getElementById("logoutBtn");
 const heroText = document.getElementById("heroText");
 
-// =======================
-// MENU TOGGLE LOGIC
-// =======================
+let unsubscribeBalance = null; // Used to stop listening to updates on logout
+
+// ==========================================
+// 4. NAVIGATION LOGIC
+// ==========================================
 menuToggle?.addEventListener("click", () => {
     navMenu.classList.toggle("active");
 });
 
-// =======================
-// AUTH STATE LISTENER
-// =======================
+// ==========================================
+// 5. AUTH & FIRESTORE LOGIC
+// ==========================================
 onAuthStateChanged(auth, (user) => {
     if (user) {
-        console.log("Logged in:", user.email);
-        
-        // 1. Hide Login/Signup container
+        console.log("User logged in:", user.uid);
+
+        // UI Adjustments
         if (authButtons) authButtons.style.display = "none";
-        
-        // 2. Show Logout/User section
         if (userSection) userSection.style.display = "block";
+        if (heroText) heroText.innerText = "Welcome Back";
+
+        // Listen for Real-time Balance from Firestore: users/{userId}/balance
+        const userDocRef = doc(db, "users", user.uid);
         
-        // 3. Update Text
-        if (heroText) heroText.innerText = "Welcome Back!";
+        unsubscribeBalance = onSnapshot(userDocRef, (docSnap) => {
+            if (docSnap.exists()) {
+                const data = docSnap.data();
+                const balance = data.balance || 0;
+                
+                // Format the balance with commas and LBP currency
+                if (userBalance) {
+                    userBalance.innerText = `${Number(balance).toLocaleString()} LBP`;
+                }
+            } else {
+                if (userBalance) userBalance.innerText = "0 LBP";
+                console.warn("User document does not exist in Firestore.");
+            }
+        }, (error) => {
+            console.error("Error fetching balance:", error);
+            if (userBalance) userBalance.innerText = "Error loading";
+        });
+
     } else {
-        console.log("Not logged in");
-        
-        // 1. Show Login/Signup container
+        console.log("User logged out");
+
+        // UI Reset
         if (authButtons) authButtons.style.display = "block";
-        
-        // 2. Hide Logout/User section
         if (userSection) userSection.style.display = "none";
-        
-        // 3. Update Text
         if (heroText) heroText.innerText = "Welcome to Our Website";
+
+        // Stop listening to Firestore updates if logged out
+        if (unsubscribeBalance) {
+            unsubscribeBalance();
+            unsubscribeBalance = null;
+        }
     }
 });
 
-// =======================
-// LOGOUT LOGIC
-// =======================
+// ==========================================
+// 6. LOGOUT LOGIC
+// ==========================================
 logoutBtn?.addEventListener("click", () => {
     signOut(auth).then(() => {
-        alert("Signed out successfully!");
+        console.log("Logged out successfully");
     }).catch((error) => {
-        console.error("Sign out error:", error);
+        console.error("Logout Error:", error);
     });
 });
