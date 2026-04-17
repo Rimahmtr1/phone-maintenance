@@ -1,6 +1,11 @@
 // Firebase setup
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.1.3/firebase-app.js";
-import { getAuth } from "https://www.gstatic.com/firebasejs/9.1.3/firebase-auth.js";
+import {
+  getAuth,
+  onAuthStateChanged,
+  signInAnonymously
+} from "https://www.gstatic.com/firebasejs/9.1.3/firebase-auth.js";
+
 import {
   getFirestore,
   collection,
@@ -27,9 +32,22 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth();
 
+let currentUser = null;
 let selectedCategory = null;
 let selectedPrice = 0;
 
+// 🔐 Ensure user is authenticated
+onAuthStateChanged(auth, async (user) => {
+  if (!user) {
+    await signInAnonymously(auth);
+  } else {
+    currentUser = user;
+    console.log("Logged in UID:", user.uid);
+  }
+});
+
+
+// UI logic
 window.addEventListener("DOMContentLoaded", () => {
   const openAlertBtn1 = document.getElementById("openAlertBtn");
   const openAlertBtn2 = document.getElementById("openAlertBtn2");
@@ -44,14 +62,12 @@ window.addEventListener("DOMContentLoaded", () => {
     selectedCategory = event.currentTarget.dataset.category;
     selectedPrice = 800000;
     alertBox1.style.display = "flex";
-    console.log("Category 1 selected:", selectedCategory);
   });
 
   openAlertBtn2?.addEventListener("click", (event) => {
     selectedCategory = event.currentTarget.dataset.category;
     selectedPrice = 500000;
     alertBox2.style.display = "flex";
-    console.log("Category 2 selected:", selectedCategory);
   });
 
   closeAlertBtn1?.addEventListener("click", () => {
@@ -62,24 +78,31 @@ window.addEventListener("DOMContentLoaded", () => {
     alertBox2.style.display = "none";
   });
 
-  buyBtn1?.addEventListener("click", () => handleBuy());
-  buyBtn2?.addEventListener("click", () => handleBuy());
+  buyBtn1?.addEventListener("click", handleBuy);
+  buyBtn2?.addEventListener("click", handleBuy);
 });
 
+
+// 🔥 Handle Buy
 async function handleBuy() {
   if (!selectedCategory || !selectedPrice) {
     return alert("No category selected.");
   }
 
+  if (!currentUser) {
+    return alert("User not ready yet. Please wait...");
+  }
+
   const confirmBuy = confirm("Are you sure you want to buy this item?");
   if (!confirmBuy) return;
 
-  const userId = localStorage.getItem("loggedUserId");
-  if (!userId) return alert("Please log in to proceed.");
+  const userId = currentUser.uid;
 
   await handlePurchase(userId, selectedCategory, selectedPrice);
 }
 
+
+// 🔥 Purchase logic
 async function handlePurchase(userId, category, price) {
   try {
     const userRef = doc(db, "users", userId);
@@ -96,6 +119,7 @@ async function handlePurchase(userId, category, price) {
     if (!itemData) return;
 
     const newBalance = balance - price;
+
     await updateDoc(userRef, { balance: newBalance });
 
     await saveTransaction(
@@ -105,15 +129,19 @@ async function handlePurchase(userId, category, price) {
       "purchase",
       balance,
       newBalance,
-      category // ✅ category passed properly
+      category
     );
 
-    window.location.href = `touch-buy.html?code=${encodeURIComponent(itemData["item-code"])}&category=${encodeURIComponent(category)}`;
+    window.location.href =
+      `touch-buy.html?code=${encodeURIComponent(itemData["item-code"])}&category=${encodeURIComponent(category)}`;
+
   } catch (err) {
     alert("Error during purchase: " + err.message);
   }
 }
 
+
+// 🔥 Get available item
 async function getAvailableItem(userId, category) {
   const q = query(
     collection(db, "items"),
@@ -123,12 +151,14 @@ async function getAvailableItem(userId, category) {
   );
 
   const snapshot = await getDocs(q);
+
   if (snapshot.empty) {
     alert("Sold out.");
     return null;
   }
 
   const docData = snapshot.docs[0];
+
   await updateDoc(doc(db, "items", docData.id), {
     selected: true,
     selectedBy: userId
@@ -137,8 +167,11 @@ async function getAvailableItem(userId, category) {
   return docData.data();
 }
 
+
+// 🔥 Save transaction
 async function saveTransaction(userId, code, amount, type, before, after, category) {
   const ref = doc(collection(db, "transactions"));
+
   await setDoc(ref, {
     transactionid: userId,
     secretcode: code,
@@ -147,6 +180,6 @@ async function saveTransaction(userId, code, amount, type, before, after, catego
     transaction_type: type,
     balance_before: before,
     balance_after: after,
-    category_type: category // ✅ Properly saved here
+    category_type: category
   });
 }
