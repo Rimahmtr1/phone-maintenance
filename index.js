@@ -46,7 +46,7 @@ onAuthStateChanged(auth, (user) => {
                 // Format with LBP and thousands separator
                 userBalance.innerText = `${Number(bal).toLocaleString()} $`;
             } else {
-                userBalance.innerText = "0 LBP";
+                userBalance.innerText = "0 $";
             }
         }, (err) => {
             console.error("Firestore Error:", err);
