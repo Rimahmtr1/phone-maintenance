@@ -2,8 +2,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.1.3/firebase-app.js";
 import {
   getAuth,
-  onAuthStateChanged,
-  signInAnonymously
+  onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/9.1.3/firebase-auth.js";
 
 import {
@@ -37,12 +36,13 @@ let selectedCategory = null;
 let selectedPrice = 0;
 
 // 🔐 Ensure user is authenticated
-onAuthStateChanged(auth, async (user) => {
-  if (!user) {
-    await signInAnonymously(auth);
-  } else {
+onAuthStateChanged(auth, (user) => {
+  if (user) {
     currentUser = user;
     console.log("Logged in UID:", user.uid);
+  } else {
+    alert("You are not logged in. Redirecting...");
+    window.location.href = "login.html";
   }
 });
 
