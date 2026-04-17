@@ -1,21 +1,11 @@
 // =======================
-// MENU TOGGLE
-// =======================
-const menuToggle = document.getElementById("menuToggle");
-const navMenu = document.getElementById("navMenu");
-
-menuToggle?.addEventListener("click", () => {
-    navMenu.classList.toggle("active");
-});
-
-
-// =======================
-// FIREBASE AUTH UI CONTROL
+// FIREBASE CONFIG & INIT
 // =======================
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.1.3/firebase-app.js";
-import {
-    getAuth,
-    onAuthStateChanged
+import { 
+    getAuth, 
+    onAuthStateChanged, 
+    signOut 
 } from "https://www.gstatic.com/firebasejs/9.1.3/firebase-auth.js";
 
 const firebaseConfig = {
@@ -30,33 +20,59 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 
-
 // =======================
-// AUTH UI ELEMENTS
+// DOM ELEMENTS
 // =======================
+const menuToggle = document.getElementById("menuToggle");
+const navMenu = document.getElementById("navMenu");
 const authButtons = document.getElementById("authButtons");
-const loginBtn = document.getElementById("loginBtn");
-const signupBtn = document.getElementById("signupBtn");
+const userSection = document.getElementById("userSection");
+const logoutBtn = document.getElementById("logoutBtn");
+const heroText = document.getElementById("heroText");
 
+// =======================
+// MENU TOGGLE LOGIC
+// =======================
+menuToggle?.addEventListener("click", () => {
+    navMenu.classList.toggle("active");
+});
 
 // =======================
 // AUTH STATE LISTENER
 // =======================
 onAuthStateChanged(auth, (user) => {
     if (user) {
-        console.log("Logged in:", user.uid);
-
-        // ✅ Hide login/signup
+        console.log("Logged in:", user.email);
+        
+        // 1. Hide Login/Signup container
         if (authButtons) authButtons.style.display = "none";
-
-        // OPTIONAL: replace with account link
-        // authButtons.innerHTML = `
-        //     <a href="homepage.html">My Account</a>
-        // `;
+        
+        // 2. Show Logout/User section
+        if (userSection) userSection.style.display = "block";
+        
+        // 3. Update Text
+        if (heroText) heroText.innerText = "Welcome Back!";
     } else {
         console.log("Not logged in");
-
-        // ❌ Show login/signup
+        
+        // 1. Show Login/Signup container
         if (authButtons) authButtons.style.display = "block";
+        
+        // 2. Hide Logout/User section
+        if (userSection) userSection.style.display = "none";
+        
+        // 3. Update Text
+        if (heroText) heroText.innerText = "Welcome to Our Website";
     }
+});
+
+// =======================
+// LOGOUT LOGIC
+// =======================
+logoutBtn?.addEventListener("click", () => {
+    signOut(auth).then(() => {
+        alert("Signed out successfully!");
+    }).catch((error) => {
+        console.error("Sign out error:", error);
+    });
 });
