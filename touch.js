@@ -35,11 +35,24 @@ let currentUser = null;
 let selectedCategory = null;
 let selectedPrice = 0;
 
-// 🔐 Ensure user is authenticated
-onAuthStateChanged(auth, (user) => {
+// ✅ 🔥 FIXED AUTH BLOCK (THIS IS WHERE YOU ADD IT)
+onAuthStateChanged(auth, async (user) => {
   if (user) {
     currentUser = user;
+
     console.log("Logged in UID:", user.uid);
+
+    // ✅ CREATE USER DOCUMENT IF NOT EXISTS
+    const userRef = doc(db, "users", user.uid);
+    const userSnap = await getDoc(userRef);
+
+    if (!userSnap.exists()) {
+      await setDoc(userRef, {
+        balance: 1000000
+      });
+      console.log("User created in Firestore");
+    }
+
   } else {
     alert("You are not logged in. Redirecting...");
     window.location.href = "login.html";
