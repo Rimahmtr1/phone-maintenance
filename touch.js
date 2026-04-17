@@ -73,13 +73,13 @@ window.addEventListener("DOMContentLoaded", () => {
 
   openAlertBtn1?.addEventListener("click", (event) => {
     selectedCategory = event.currentTarget.dataset.category;
-    selectedPrice = 800000;
+    selectedPrice = 9;
     alertBox1.style.display = "flex";
   });
 
   openAlertBtn2?.addEventListener("click", (event) => {
     selectedCategory = event.currentTarget.dataset.category;
-    selectedPrice = 500000;
+    selectedPrice = 6;
     alertBox2.style.display = "flex";
   });
 
