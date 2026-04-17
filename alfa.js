@@ -1,9 +1,10 @@
 // Firebase setup
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.1.3/firebase-app.js";
-import { 
-  getAuth, 
-  onAuthStateChanged 
+import {
+  getAuth,
+  onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/9.1.3/firebase-auth.js";
+
 import {
   getFirestore,
   collection,
@@ -30,30 +31,36 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth();
 
-let currentUser = null; // Changed from localStorage reliance
+let currentUser = null;
 let selectedCategory = null;
 let selectedPrice = 0;
 
-// ✅ TRACK AUTH STATE
+// ✅ 🔥 FIXED AUTH BLOCK (THIS IS WHERE YOU ADD IT)
 onAuthStateChanged(auth, async (user) => {
   if (user) {
     currentUser = user;
+
     console.log("Logged in UID:", user.uid);
 
-    // Sync/Create user document if it doesn't exist
+    // ✅ CREATE USER DOCUMENT IF NOT EXISTS
     const userRef = doc(db, "users", user.uid);
     const userSnap = await getDoc(userRef);
 
     if (!userSnap.exists()) {
-      await setDoc(userRef, { balance: 1000000 });
+      await setDoc(userRef, {
+        balance: 1000000
+      });
       console.log("User created in Firestore");
     }
+
   } else {
     alert("You are not logged in. Redirecting...");
     window.location.href = "login.html";
   }
 });
 
+
+// UI logic
 window.addEventListener("DOMContentLoaded", () => {
   const openAlertBtn1 = document.getElementById("openAlertBtn");
   const openAlertBtn2 = document.getElementById("openAlertBtn2");
@@ -88,6 +95,8 @@ window.addEventListener("DOMContentLoaded", () => {
   buyBtn2?.addEventListener("click", handleBuy);
 });
 
+
+// 🔥 Handle Buy
 async function handleBuy() {
   if (!selectedCategory || !selectedPrice) {
     return alert("No category selected.");
@@ -100,9 +109,13 @@ async function handleBuy() {
   const confirmBuy = confirm("Are you sure you want to buy this item?");
   if (!confirmBuy) return;
 
-  await handlePurchase(currentUser.uid, selectedCategory, selectedPrice);
+  const userId = currentUser.uid;
+
+  await handlePurchase(userId, selectedCategory, selectedPrice);
 }
 
+
+// 🔥 Purchase logic
 async function handlePurchase(userId, category, price) {
   try {
     const userRef = doc(db, "users", userId);
@@ -116,21 +129,33 @@ async function handlePurchase(userId, category, price) {
     if (balance < price) return alert("Insufficient balance.");
 
     const itemData = await getAvailableItem(userId, category);
-    if (!itemData) return; // Sold out alert is inside getAvailableItem
+    if (!itemData) return;
 
     const newBalance = balance - price;
+
     await updateDoc(userRef, { balance: newBalance });
 
-    await saveTransaction(userId, itemData["item-code"], price, "purchase", balance, newBalance, category);
+    await saveTransaction(
+      userId,
+      itemData["item-code"],
+      price,
+      "purchase",
+      balance,
+      newBalance,
+      category
+    );
 
-    window.location.href = `alfa-buy.html?code=${encodeURIComponent(itemData["item-code"])}&category=${encodeURIComponent(category)}`;
+    window.location.href =
+      `touch-buy.html?code=${encodeURIComponent(itemData["item-code"])}&category=${encodeURIComponent(category)}`;
+
   } catch (err) {
     alert("Error during purchase: " + err.message);
   }
 }
 
+
+// 🔥 Get available item
 async function getAvailableItem(userId, category) {
-  // ✅ Points to 'items-alfa' collection as per your original file
   const q = query(
     collection(db, "items-alfa"),
     where("selected", "==", false),
@@ -139,13 +164,15 @@ async function getAvailableItem(userId, category) {
   );
 
   const snapshot = await getDocs(q);
+
   if (snapshot.empty) {
     alert("Sold out.");
     return null;
   }
 
   const docData = snapshot.docs[0];
-  await updateDoc(doc(db, "items-alfa", docData.id), {
+
+  await updateDoc(doc(db, "items", docData.id), {
     selected: true,
     selectedBy: userId
   });
@@ -153,8 +180,11 @@ async function getAvailableItem(userId, category) {
   return docData.data();
 }
 
+
+// 🔥 Save transaction
 async function saveTransaction(userId, code, amount, type, before, after, category) {
   const ref = doc(collection(db, "transactions"));
+
   await setDoc(ref, {
     transactionid: userId,
     secretcode: code,
