@@ -44,7 +44,7 @@ onAuthStateChanged(auth, (user) => {
                 const data = docSnap.data();
                 const bal = data.balance ?? 0;
                 // Format with LBP and thousands separator
-                userBalance.innerText = `${Number(bal).toLocaleString()} LBP`;
+                userBalance.innerText = `${Number(bal).toLocaleString()} $`;
             } else {
                 userBalance.innerText = "0 LBP";
             }
