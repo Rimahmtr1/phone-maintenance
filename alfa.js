@@ -1,6 +1,9 @@
 // Firebase setup
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.1.3/firebase-app.js";
-import { getAuth } from "https://www.gstatic.com/firebasejs/9.1.3/firebase-auth.js";
+import { 
+  getAuth, 
+  onAuthStateChanged 
+} from "https://www.gstatic.com/firebasejs/9.1.3/firebase-auth.js";
 import {
   getFirestore,
   collection,
@@ -27,8 +30,29 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth();
 
+let currentUser = null; // Changed from localStorage reliance
 let selectedCategory = null;
 let selectedPrice = 0;
+
+// ✅ TRACK AUTH STATE
+onAuthStateChanged(auth, async (user) => {
+  if (user) {
+    currentUser = user;
+    console.log("Logged in UID:", user.uid);
+
+    // Sync/Create user document if it doesn't exist
+    const userRef = doc(db, "users", user.uid);
+    const userSnap = await getDoc(userRef);
+
+    if (!userSnap.exists()) {
+      await setDoc(userRef, { balance: 1000000 });
+      console.log("User created in Firestore");
+    }
+  } else {
+    alert("You are not logged in. Redirecting...");
+    window.location.href = "login.html";
+  }
+});
 
 window.addEventListener("DOMContentLoaded", () => {
   const openAlertBtn1 = document.getElementById("openAlertBtn");
@@ -60,8 +84,8 @@ window.addEventListener("DOMContentLoaded", () => {
     alertBox2.style.display = "none";
   });
 
-  buyBtn1?.addEventListener("click", () => handleBuy());
-  buyBtn2?.addEventListener("click", () => handleBuy());
+  buyBtn1?.addEventListener("click", handleBuy);
+  buyBtn2?.addEventListener("click", handleBuy);
 });
 
 async function handleBuy() {
@@ -69,13 +93,14 @@ async function handleBuy() {
     return alert("No category selected.");
   }
 
+  if (!currentUser) {
+    return alert("User not ready yet. Please wait...");
+  }
+
   const confirmBuy = confirm("Are you sure you want to buy this item?");
   if (!confirmBuy) return;
 
-  const userId = localStorage.getItem("loggedUserId");
-  if (!userId) return alert("Please log in to proceed.");
-
-  await handlePurchase(userId, selectedCategory, selectedPrice);
+  await handlePurchase(currentUser.uid, selectedCategory, selectedPrice);
 }
 
 async function handlePurchase(userId, category, price) {
@@ -91,12 +116,11 @@ async function handlePurchase(userId, category, price) {
     if (balance < price) return alert("Insufficient balance.");
 
     const itemData = await getAvailableItem(userId, category);
-    if (!itemData) return;
+    if (!itemData) return; // Sold out alert is inside getAvailableItem
 
     const newBalance = balance - price;
     await updateDoc(userRef, { balance: newBalance });
 
-    // Save transaction including category_type
     await saveTransaction(userId, itemData["item-code"], price, "purchase", balance, newBalance, category);
 
     window.location.href = `alfa-buy.html?code=${encodeURIComponent(itemData["item-code"])}&category=${encodeURIComponent(category)}`;
@@ -106,6 +130,7 @@ async function handlePurchase(userId, category, price) {
 }
 
 async function getAvailableItem(userId, category) {
+  // ✅ Points to 'items-alfa' collection as per your original file
   const q = query(
     collection(db, "items-alfa"),
     where("selected", "==", false),
@@ -138,6 +163,6 @@ async function saveTransaction(userId, code, amount, type, before, after, catego
     transaction_type: type,
     balance_before: before,
     balance_after: after,
-    category_type: category // Add category_type to the transaction
+    category_type: category
   });
 }
