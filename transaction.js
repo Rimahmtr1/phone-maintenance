@@ -51,7 +51,7 @@ function renderTransaction(tx) {
   // Add an event listener to open an alert with transaction details
   transactionLink.addEventListener('click', () => {
     alert(`
-Transaction INFO:
+Transaction INFO:${tx.transactionid}
 Secret Code: ${tx.secretcode}
 Date: ${formatDate(tx.transaction_date)}
 Type: ${tx.transaction_type}
